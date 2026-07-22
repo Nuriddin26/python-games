@@ -2,79 +2,254 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Уровень 2: Запрос (Query) 🍕</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Экшн-Пиццерия (Query) 🍕</title>
     <style>
-        body { font-family: sans-serif; background: #1e1e2f; color: #fff; text-align: center; padding: 20px; }
-        h1 { color: #ff9800; }
-        .container { display: flex; gap: 20px; justify-content: center; text-align: left; max-width: 1000px; margin: auto; }
-        .theory, .practice { background: #2a2a40; padding: 20px; border-radius: 10px; width: 50%; border: 2px solid #5c3a21; }
-        .theory h2 { color: #ffeb3b; }
-        .url-box { background: #111; padding: 10px; color: #00ff00; font-family: monospace; border-radius: 5px; word-break: break-all;}
-        .palette { display: flex; flex-direction: column; gap: 10px; min-height: 50px; background: #1a1a2e; padding: 15px; border-radius: 5px;}
-        .code-block { background: #282c34; border-left: 5px solid #ff9800; padding: 10px; cursor: grab; font-family: monospace; border-radius: 5px; user-select: none; }
-        .drop-zone { background: #1a1a2e; border: 2px dashed #6c6c86; height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #555; }
-        .drop-zone .code-block { width: 100%; margin: 0; }
-        button { background: #ff9800; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; font-size: 16px; color: #fff;}
-        .result { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0c10; color: #c5c6c7; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #f39c12; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(243, 156, 18, 0.5); }
+        
+        .game-container { max-width: 1000px; margin: 0 auto; background: #1f2833; border-radius: 15px; box-shadow: 0 0 20px rgba(243, 156, 18, 0.2); border: 2px solid #e67e22; overflow: hidden; }
+        .tabs { display: flex; background: #0b0c10; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0b0c10; color: #777; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: #fff; background-color: #1f2833; border-bottom: 4px solid #f39c12; }
+        .tab-btn:hover:not(.active) { background-color: #1a2028; color: #ccc; }
+        
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
+        .level-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .instruction { font-size: 22px; color: #f39c12; font-weight: bold; margin-bottom: 20px; }
+
+        /* УРОВЕНЬ 1: Экшн-Пиццерия */
+        .action-zone { background: #0b0c10; padding: 30px; border-radius: 10px; border: 2px dashed #e67e22; margin-top: 20px; position: relative; overflow: hidden; }
+        
+        .url-bar { background: #1a2028; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 20px; color: #fff; border: 1px solid #e67e22; margin-bottom: 20px; text-align: left; display: flex; align-items: center; justify-content: center;}
+        .url-base { color: #888; }
+        .url-syntax { color: #f1c40f; font-weight: bold; }
+        .url-param { color: #e74c3c; font-weight: bold; text-shadow: 0 0 5px rgba(231, 76, 60, 0.5); transition: 0.3s;}
+        .url-param2 { color: #3498db; font-weight: bold; text-shadow: 0 0 5px rgba(52, 152, 219, 0.5); transition: 0.3s;}
+        
+        .input-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .pizza-select { padding: 12px 20px; font-size: 18px; border-radius: 8px; border: 2px solid #f39c12; background: #1f2833; color: #fff; outline: none; cursor: pointer; font-weight: bold; }
+        
+        .btn-action { background: #e67e22; color: #fff; font-weight: bold; font-size: 18px; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-action:hover { background: #f39c12; box-shadow: 0 0 15px rgba(243, 156, 18, 0.5); transform: scale(1.05); }
+        .btn-action:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        .kitchen { height: 180px; background: #111; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #333; }
+        .oven { width: 120px; height: 140px; background: #222; position: absolute; right: 20px; border-radius: 20px 20px 0 0; border: 5px solid #444; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px; z-index: 5; }
+        .oven-fire { width: 80px; height: 40px; background: rgba(231, 76, 60, 0.2); border-radius: 50% 50% 10px 10px; box-shadow: 0 0 20px #e74c3c; transition: 0.5s; }
+        .oven.baking .oven-fire { background: rgba(241, 196, 15, 0.8); box-shadow: 0 0 40px #f1c40f, 0 0 20px #e74c3c; animation: flicker 0.2s infinite; }
+        
+        .pizza-dough { font-size: 60px; position: absolute; left: -100px; z-index: 3; transition: transform 0.3s; }
+        
+        .server-response { margin-top: 20px; font-size: 24px; font-weight: bold; color: #2ecc71; opacity: 0; transition: 0.5s; font-family: monospace; }
+
+        @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        /* УРОВЕНЬ 2: Сборка Кода */
+        .code-workspace { display: flex; gap: 20px; text-align: left; margin-top: 20px; }
+        .palette-code, .editor-code { background: #0b0c10; padding: 20px; border-radius: 10px; width: 50%; border: 1px solid #e67e22; }
+        .palette-code h3, .editor-code h3 { color: #f39c12; margin-top: 0; text-align: center; }
+        .code-block { background: #1f2833; border-left: 5px solid #f39c12; padding: 15px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .code-block:active { cursor: grabbing; }
+        .c-kw { color: #c678dd; } .c-func { color: #61afef; } .c-str { color: #98c379; }
+        
+        .drop-zone-code { background: #111; border: 2px dashed #e67e22; height: 50px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 14px; transition: 0.2s; }
+        .drop-zone-code.dragover { border-color: #f39c12; background: rgba(243,156,18,0.1); }
+        .drop-zone-code .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        
+        .btn-check { background: #f39c12; color: #000; border: none; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; text-transform: uppercase; }
+        .btn-check:hover { background: #e67e22; color: #fff; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
-    <h1>Уровень 2: Параметры Запроса (Query) 🍕</h1>
-    <div class="container">
-        <div class="theory">
-            <h2>Зачем нужны знак вопроса "?" и "&"?</h2>
-            <p>Представь, что ты заказываешь пиццу. Пиццерия одна (это адрес), но фильтры и настройки у каждого клиента разные.</p>
-            <p>Мы используем <b>?</b> чтобы сказать серверу: "Дальше идут мои настройки!". А знак <b>&</b> нужен, чтобы соединить несколько настроек вместе.</p>
-            <div class="url-box">http://127.0.0.1:8000/pizza<span style="color:#ff9800">?type=сырная&size=большая</span></div>
-            <p>FastAPI сам найдет слова <b>type</b> и <b>size</b> и передаст их в твою функцию!</p>
+
+    <h1>🍕 Экшн-Пиццерия (Query Параметры) 🍕</h1>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(1)">1. Тест: Настройки заказа</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Сборка Сервера</button>
         </div>
-        <div class="practice">
-            <h2>Собери сервер пиццерии:</h2>
-            <div class="palette" id="palette">
-                <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
-                <div class="code-block" draggable="true" id="b4">def order_pizza(type: str, size: str):</div>
-                <div class="code-block" draggable="true" id="b1">from fastapi import FastAPI</div>
-                <div class="code-block" draggable="true" id="b5">&nbsp;&nbsp;&nbsp;&nbsp;return f"Пицца '{type}', размер '{size}'"</div>
-                <div class="code-block" draggable="true" id="b3">@app.get("/pizza")</div>
-            </div>
-            <h3>Твой код:</h3>
-            <div class="drop-zone" data-expected="b1">Импорт FastAPI</div>
-            <div class="drop-zone" data-expected="b2">Инициализация app</div>
-            <div class="drop-zone" data-expected="b3">Адрес пиццерии (без переменных!)</div>
-            <div class="drop-zone" data-expected="b4">Функция с фильтрами</div>
-            <div class="drop-zone" data-expected="b5">Ответ клиенту</div>
+
+        <!-- УРОВЕНЬ 1: Экшн-Пиццерия -->
+        <div id="tab1" class="level-content active">
+            <div class="instruction">⚡ ЗАДАЧА: Настрой фильтры и отправь заказ в печь!</div>
+            <p style="color: #aaa; margin-bottom: 20px;">Query-параметры — это настройки. Знак <b style="color:#f1c40f">?</b> открывает настройки, а знак <b style="color:#f1c40f">&</b> соединяет их вместе[cite: 11].</p>
             
-            <button onclick="check()">Запустить пиццерию ▶️</button>
-            <div id="res" class="result"></div>
+            <div class="action-zone">
+                <div class="url-bar">
+                    <span class="url-base">http://127.0.0.1:8000/pizza</span><span class="url-syntax">?</span>type=<span class="url-param" id="urlType">маргарита</span><span class="url-syntax">&</span>size=<span class="url-param2" id="urlSize">средняя</span>
+                </div>
+                
+                <div class="input-group">
+                    <select id="typeSelect" class="pizza-select" onchange="updateUrl()">
+                        <option value="маргарита">🧀 Маргарита</option>
+                        <option value="пепперони">🍕 Пепперони</option>
+                        <option value="грибная">🍄 Грибная</option>
+                    </select>
+                    
+                    <select id="sizeSelect" class="pizza-select" onchange="updateUrl()">
+                        <option value="маленькая">🤏 Маленькая</option>
+                        <option value="средняя" selected>👌 Средняя</option>
+                        <option value="большая">👐 Большая</option>
+                    </select>
+
+                    <button class="btn-action" id="btnBake" onclick="bakePizza()">Испечь пиццу 👨‍🍳</button>
+                </div>
+                
+                <div class="kitchen">
+                    <div class="pizza-dough" id="pizzaDough">🫓</div>
+                    <div class="oven" id="oven">
+                        <div class="oven-fire"></div>
+                    </div>
+                </div>
+                
+                <div class="server-response" id="serverResponse"></div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Сборка Кода -->
+        <div id="tab2" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Собери сервер, который прочитает фильтры!</div>
+            
+            <div class="code-workspace">
+                <div class="palette-code" id="codePal">
+                    <h3>Детали кода</h3>
+                    <div class="code-block" draggable="true" id="b3"><span class="c-kw">@app.get</span>(<span class="c-str">"/pizza"</span>)</div>
+                    <div class="code-block" draggable="true" id="b1"><span class="c-kw">from</span> fastapi <span class="c-kw">import</span> FastAPI</div>
+                    <div class="code-block" draggable="true" id="b5">&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-str">f"Пицца {type}, размер {size}"</span></div>
+                    <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
+                    <div class="code-block" draggable="true" id="b4"><span class="c-kw">def</span> <span class="c-func">order_pizza</span>(type: <span class="c-kw">str</span>, size: <span class="c-kw">str</span>):</div>
+                </div>
+                
+                <div class="editor-code">
+                    <h3>Редактор Python</h3>
+                    <div class="drop-zone-code" data-expected="b1" data-hint="1. Импорт библиотеки">1. Импорт библиотеки[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b2" data-hint="2. Создание приложения">2. Создание приложения[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b3" data-hint="3. Маршрут (базовый адрес)">3. Маршрут (базовый адрес)[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b4" data-hint="4. Функция (ловит type и size)">4. Функция (ловит type и size)[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b5" data-hint="5. Ответ сервера">5. Ответ сервера[cite: 11]</div>
+                </div>
+            </div>
+            <button class="btn-check" onclick="checkServerCode()">АКТИВИРОВАТЬ ПИЦЦЕРИЮ ▶️</button>
+            <div id="resCode" class="res-msg"></div>
         </div>
     </div>
+
     <script>
-        let dragged;
-        document.addEventListener('dragstart', e => dragged = e.target);
-        document.querySelectorAll('.drop-zone, .palette').forEach(zone => {
-            zone.addEventListener('dragover', e => e.preventDefault());
-            zone.addEventListener('drop', e => {
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
+        }
+
+        // --- УРОВЕНЬ 1: Экшн-Пиццерия ---
+        function updateUrl() {
+            const typeVal = document.getElementById('typeSelect').value;
+            const sizeVal = document.getElementById('sizeSelect').value;
+            
+            const pType = document.getElementById('urlType');
+            const pSize = document.getElementById('urlSize');
+            
+            pType.innerText = typeVal;
+            pSize.innerText = sizeVal;
+
+            // Анимация подмигивания текста
+            pType.style.opacity = 0; pSize.style.opacity = 0;
+            setTimeout(() => { pType.style.opacity = 1; pSize.style.opacity = 1; }, 150);
+        }
+
+        function bakePizza() {
+            const btn = document.getElementById('btnBake');
+            btn.disabled = true;
+            
+            const typeVal = document.getElementById('typeSelect').value;
+            const sizeVal = document.getElementById('sizeSelect').value;
+            const res = document.getElementById('serverResponse');
+            const pizza = document.getElementById('pizzaDough');
+            const oven = document.getElementById('oven');
+            
+            res.style.opacity = "0"; // Прячем прошлый ответ
+            
+            // Настройка визуала пиццы перед печью
+            let scale = sizeVal === 'маленькая' ? 'scale(0.7)' : (sizeVal === 'большая' ? 'scale(1.3)' : 'scale(1)');
+            pizza.innerText = "🫓"; // Сырое тесто
+            pizza.style.transform = scale;
+            
+            // Анимация 1: Тесто едет в печь
+            pizza.style.transition = "left 1s ease-in";
+            pizza.style.left = "calc(100% - 100px)"; 
+            
+            setTimeout(() => {
+                // Анимация 2: Запекание
+                oven.classList.add('baking');
+                pizza.style.opacity = "0"; // Прячется в печи
+                
+                setTimeout(() => {
+                    // Пицца готова
+                    oven.classList.remove('baking');
+                    pizza.innerText = typeVal === 'маргарита' ? '🧀' : (typeVal === 'пепперони' ? '🍕' : '🍄');
+                    pizza.style.opacity = "1";
+                    
+                    // Анимация 3: Выезжает к клиенту
+                    pizza.style.transition = "left 1s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                    pizza.style.left = "20px";
+                    
+                    setTimeout(() => {
+                        // Ответ сервера
+                        res.innerText = `✅ Сервер ответил: "Пицца '${typeVal}', размер '${sizeVal}' готова!"`;
+                        res.style.opacity = "1";
+                        btn.disabled = false;
+                    }, 1000);
+                    
+                }, 1500); // Время выпекания
+            }, 1000); // Время поездки до печи
+        }
+
+        // --- УРОВЕНЬ 2: Сборка Кода ---
+        let draggedBlock = null;
+        document.querySelectorAll('.code-block').forEach(b => {
+            b.addEventListener('dragstart', function() { draggedBlock = this; });
+        });
+
+        document.querySelectorAll('.drop-zone-code, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { e.preventDefault(); if(z.classList.contains('drop-zone-code')) z.classList.add('dragover'); });
+            z.addEventListener('dragleave', () => { if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover'); });
+            z.addEventListener('drop', e => {
                 e.preventDefault();
-                if (zone.classList.contains('drop-zone') && zone.children.length > 0) {
-                    document.getElementById('palette').appendChild(zone.children[0]);
+                if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
+                
+                if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
+                    document.getElementById('codePal').appendChild(z.children[0]);
                 }
-                if (dragged) zone.appendChild(dragged);
+                if(draggedBlock && draggedBlock.classList.contains('code-block')) {
+                    if(z.classList.contains('drop-zone-code')) z.innerHTML = '';
+                    z.appendChild(draggedBlock);
+                }
             });
         });
 
-        function check() {
+        function checkServerCode() {
             let correct = true, empty = false;
-            document.querySelectorAll('.drop-zone').forEach(z => {
-                if (!z.firstElementChild) empty = true;
-                else if (z.firstElementChild.id !== z.dataset.expected) correct = false;
+            document.querySelectorAll('.drop-zone-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.id !== z.dataset.expected) correct = false;
             });
-            const r = document.getElementById('res');
+            
+            let r = document.getElementById('resCode');
             r.style.display = 'block';
-            if (empty) { r.className = 'result error'; r.innerHTML = '⚠️ Расставь все блоки!'; }
-            else if (correct) { r.className = 'result success'; r.innerHTML = '✅ Супер! Заказы на пиццу принимаются!'; }
-            else { r.className = 'result error'; r.innerHTML = '❌ Ошибка. Проверь порядок: импорт -> app -> get -> функция -> return.'; }
+            
+            if(empty) { 
+                r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки на места!'; 
+            } else if(correct) { 
+                r.style.background = '#2ecc71'; r.style.color='#000'; r.innerText = '✅ ИДЕАЛЬНО! Сервер пиццерии запущен и сам вытаскивает фильтры из ссылки!'; 
+            } else { 
+                r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка в структуре! Вспомни: Импорт -> app -> get -> функция -> return.'; 
+            }
         }
     </script>
 </body>
