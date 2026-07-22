@@ -3,268 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра: Завод Чертежей (Классы) 🏗️</title>
+    <title>Игра: Экшн-Завод Чертежей 🏗️</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1e272e; color: #d2dae2; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #0fbcf9; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        p { font-size: 18px; color: #808e9b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0c10; color: #c5c6c7; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #66fcf1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5); }
         
-        .game-container { max-width: 1100px; margin: 0 auto; background: #2d3436; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; border: 3px solid #1e272e; }
-        .tabs { display: flex; background: #111417; }
-        .tab-btn { flex: 1; padding: 18px; font-size: 16px; font-weight: bold; border: none; background: #111417; color: #808e9b; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
-        .tab-btn.active { color: #fff; background-color: #2d3436; border-bottom: 4px solid #0fbcf9; }
-        .tab-btn:hover:not(.active) { background-color: #1e272e; color: #d2dae2; }
+        .game-container { max-width: 1000px; margin: 0 auto; background: #1f2833; border-radius: 15px; box-shadow: 0 0 20px rgba(102, 252, 241, 0.2); border: 2px solid #45a29e; overflow: hidden; }
+        .tabs { display: flex; background: #0b0c10; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0b0c10; color: #777; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: #fff; background-color: #1f2833; border-bottom: 4px solid #66fcf1; }
+        .tab-btn:hover:not(.active) { background-color: #1a2028; color: #ccc; }
         
-        .level-content { display: none; padding: 30px; animation: fadeIn 0.4s; text-align: left; }
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
         .level-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        /* Уровень 1: Чертежи и Объекты */
-        .factory-floor { display: flex; gap: 20px; margin-top: 20px; }
-        .blueprint-zone, .objects-zone { background: #1e272e; padding: 20px; border-radius: 10px; border: 2px solid #0fbcf9; width: 50%; text-align: center; }
-        .blueprint-card { background: #0984e3; padding: 15px; border-radius: 8px; color: white; font-family: monospace; display: inline-block; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); border: 2px dashed #fff; }
-        .btn-build { background: #0fbcf9; color: #1e272e; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 15px; transition: 0.2s; }
-        .btn-build:hover { background: #00a8ff; transform: scale(1.05); }
+        .instruction { font-size: 22px; color: #45a29e; font-weight: bold; margin-bottom: 20px; }
+
+        /* УРОВЕНЬ 1: 3D Принтер (Класс -> Объекты) */
+        .factory-zone { display: flex; justify-content: space-around; align-items: center; margin-top: 20px; background: #0b0c10; padding: 20px; border-radius: 10px; border: 2px dashed #45a29e; }
+        .blueprint-panel { background: #1f2833; padding: 15px; border-radius: 10px; border: 1px solid #66fcf1; text-align: left; box-shadow: 0 0 15px rgba(102, 252, 241, 0.3); }
+        .blueprint-panel h3 { margin: 0 0 10px 0; color: #66fcf1; text-align: center;}
+        .code-blueprint { font-family: monospace; color: #c678dd; font-size: 16px; font-weight: bold;}
         
-        .conveyor { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; justify-content: center; min-height: 100px; background: #2d3436; padding: 15px; border-radius: 8px; }
-        .robot-obj { background: #ffdd59; color: #1e272e; padding: 10px; border-radius: 5px; font-weight: bold; font-family: monospace; animation: popIn 0.3s; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-
-        /* Уровень 2: Pydantic */
-        .pydantic-guard { background: #2c3e50; padding: 20px; border-radius: 10px; text-align: center; border: 3px solid #f53b57; margin-top: 20px; position: relative; }
-        .guard-icon { font-size: 60px; margin-bottom: 10px; }
-        .form-row { margin: 15px 0; }
-        .form-row input { padding: 10px; font-size: 16px; border-radius: 5px; border: 2px solid #808e9b; outline: none; width: 60%; text-align: center; }
-        .btn-inspect { background: #f53b57; color: white; border: none; padding: 12px 25px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .btn-inspect:hover { background: #ff3f34; }
-        .validation-result { margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-
-        /* Уровень 3: Сборка Кода */
-        .workspace { display: flex; gap: 20px; margin-top: 20px; }
-        .palette, .editor { background: #1e272e; padding: 20px; border-radius: 10px; width: 50%; }
-        .palette h3, .editor h3 { text-align: center; color: #0fbcf9; margin-top: 0; }
+        .btn-print { background: #45a29e; color: #000; font-weight: bold; font-size: 18px; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 0 #2c7a7b; }
+        .btn-print:active { transform: translateY(5px); box-shadow: 0 0 0 #2c7a7b; }
         
-        .block { background: #2d3436; border-left: 5px solid #0fbcf9; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; user-select: none; color: #d2dae2; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .block:active { cursor: grabbing; }
-        .code-keyword { color: #c678dd; } 
-        .code-type { color: #e5c07b; } 
-        
-        .drop-zone { background: #111417; border: 2px dashed #808e9b; min-height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #808e9b; transition: 0.2s; }
-        .drop-zone.dragover { background: #1e272e; border-color: #0fbcf9; }
-        .drop-zone .block { margin: 0; width: 100%; box-sizing: border-box; }
+        .conveyor-belt { width: 400px; min-height: 150px; background: #111; border-bottom: 8px solid #333; border-radius: 10px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; padding: 10px; box-sizing: border-box; }
+        .robot-instance { background: #f1c40f; color: #000; padding: 10px; border-radius: 5px; font-weight: bold; font-family: monospace; font-size: 14px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { 0% { transform: scale(0) translateY(-50px); } 100% { transform: scale(1) translateY(0); } }
 
-        .btn-check { background: #0be881; color: #1e272e; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 20px; width: 100%; }
-        .btn-check:hover { background: #05c46b; transform: scale(1.02); }
+        /* УРОВЕНЬ 2: Таможня Pydantic */
+        .scanner-zone { display: flex; flex-direction: column; align-items: center; background: #0b0c10; padding: 20px; border-radius: 10px; border: 2px solid #e74c3c; margin-top: 20px; position: relative; }
+        .inputs-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .inputs-row input { padding: 12px; border-radius: 5px; border: 2px solid #45a29e; background: #1f2833; color: #fff; font-size: 16px; font-weight: bold; text-align: center; outline: none; }
+        .btn-scan { background: #e74c3c; color: #fff; border: none; padding: 12px 25px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-scan:hover { background: #c0392b; box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
+        
+        .scanner-machine { width: 300px; height: 150px; border: 4px solid #777; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; background: #111; overflow: hidden; margin-top: 20px; }
+        .data-box { background: #66fcf1; color: #000; padding: 10px 20px; border-radius: 5px; font-family: monospace; font-weight: bold; font-size: 16px; opacity: 0; transform: translateX(-100px); transition: 0.5s; }
+        .laser { position: absolute; width: 100%; height: 5px; background: rgba(255, 0, 0, 0.8); top: -10px; box-shadow: 0 0 10px red; display: none; z-index: 10; }
+        
+        @keyframes scanAnim { 0% { top: 0; } 50% { top: 145px; } 100% { top: 0; } }
+        @keyframes shakeAlert { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-5deg); } 75% { transform: translateX(10px) rotate(5deg); } }
+        
+        .scan-result { margin-top: 15px; font-size: 20px; font-weight: bold; min-height: 30px; }
+
+        /* УРОВЕНЬ 3: Код */
+        .code-workspace { display: flex; gap: 20px; text-align: left; }
+        .palette-code, .editor-code { background: #0b0c10; padding: 20px; border-radius: 10px; width: 50%; border: 1px solid #45a29e; }
+        .palette-code h3, .editor-code h3 { color: #45a29e; margin-top: 0; text-align: center; }
+        .code-block { background: #1f2833; border-left: 5px solid #66fcf1; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .code-block:active { cursor: grabbing; }
+        .c-kw { color: #c678dd; } .c-type { color: #e5c07b; }
+        
+        .drop-zone-code { background: #111; border: 2px dashed #45a29e; height: 50px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 14px; transition: 0.2s; }
+        .drop-zone-code.dragover { border-color: #66fcf1; background: rgba(102,252,241,0.1); }
+        .drop-zone-code .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        
+        .btn-check { background: #66fcf1; color: #000; border: none; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; }
+        .btn-check:hover { background: #45a29e; color: #fff; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <h1>🏗️ Завод Чертежей (Классы) 🏗️</h1>
-    <p>Узнай, как создавать свои собственные типы данных и охранять их!</p>
+    <h1>🏗️ Экшн-Завод Чертежей 🏗️</h1>
 
     <div class="game-container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab(1)">1. Чертеж (Class)</button>
-            <button class="tab-btn" onclick="switchTab(2)">2. Инспектор Pydantic</button>
-            <button class="tab-btn" onclick="switchTab(3)">3. Практика (Код)</button>
+            <button class="tab-btn active" onclick="openTab(1)">1. Завод (Class)</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Сканер Pydantic</button>
+            <button class="tab-btn" onclick="openTab(3)">3. Сборка Кода</button>
         </div>
 
-        <!-- УРОВЕНЬ 1: Что такое Класс? -->
+        <!-- УРОВЕНЬ 1: 3D Принтер -->
         <div id="tab1" class="level-content active">
-            <h2>Класс — это чертеж. Объект — это готовая деталь.</h2>
-            <p>Представь инструкцию по сборке LEGO-робота. Сама инструкция (чертеж) играть не может, она только из бумаги. Но по этой инструкции мы можем собрать 100 разных роботов (объектов)!</p>
-            <p>В Python <b>Класс (class)</b> — это такой чертеж.</p>
+            <div class="instruction">⚡ ЗАДАЧА: Напечатай 5 роботов из одного чертежа!</div>
+            <p style="color: #aaa; margin-bottom: 20px;">Класс — это просто инструкция. Из одного класса можно сделать сколько угодно объектов[cite: 7].</p>
             
-            <div class="factory-floor">
-                <div class="blueprint-zone">
-                    <h3>Чертеж (Class Robot)</h3>
-                    <div class="blueprint-card">
+            <div class="factory-zone">
+                <div class="blueprint-panel">
+                    <h3>📄 Чертеж (Class)</h3>
+                    <div class="code-blueprint">
                         class Robot:<br>
                         &nbsp;&nbsp;name: str<br>
                         &nbsp;&nbsp;color: str
-                    </div><br>
-                    <button class="btn-build" onclick="buildRobot()">Собрать Робота (Создать Объект)</button>
-                </div>
-                
-                <div class="objects-zone">
-                    <h3>Конвейер готовых объектов</h3>
-                    <div class="conveyor" id="conveyor">
-                        <!-- Сюда будут падать роботы -->
                     </div>
                 </div>
+                
+                <button class="btn-print" onclick="printRobot()">🖨️ ПЕЧАТАТЬ<br>Robot()</button>
+                
+                <div class="conveyor-belt" id="conveyor">
+                    <!-- Роботы падают сюда -->
+                </div>
             </div>
         </div>
 
-        <!-- УРОВЕНЬ 2: Зачем нужен Pydantic? -->
+        <!-- УРОВЕНЬ 2: Таможня Pydantic -->
         <div id="tab2" class="level-content">
-            <h2>Зачем нужен Pydantic? 🕵️‍♂️</h2>
-            <p>В обычном Python мы можем сказать, что возраст кота — это слово "мяу". Python промолчит, а потом программа сломается! Библиотека <b>Pydantic (BaseModel)</b> работает как строгий инспектор на таможне. Он проверяет, чтобы данные ТОЧНО совпадали с чертежом!</p>
-
-            <div class="pydantic-guard">
-                <div class="guard-icon">👮‍♂️</div>
-                <h3 style="color: #ff5e57;">Таможня Pydantic: Проверка Кота!</h3>
-                <p>Попробуй обмануть инспектора. Введи вместо возраста (int) какое-нибудь слово и нажми кнопку.</p>
-                
-                <div class="form-row">
-                    <label><b>Имя (str):</b></label><br>
-                    <input type="text" id="catName" placeholder="Например: Барсик" value="Барсик">
+            <div class="instruction">⚡ ЗАДАЧА: Попробуй обмануть Таможню Pydantic!</div>
+            <p style="color: #aaa; margin-bottom: 20px;">Инспектор проверяет посылки. Если в поле "Возраст (int)" лежит текст, посылка будет уничтожена[cite: 7]!</p>
+            
+            <div class="scanner-zone" id="scannerZone">
+                <div class="inputs-row">
+                    <input type="text" id="catName" placeholder="Имя кота" value="Барсик">
+                    <input type="text" id="catAge" placeholder="Введи текст (напр. 'пять')">
                 </div>
-                <div class="form-row">
-                    <label><b>Возраст (int):</b></label><br>
-                    <input type="text" id="catAge" placeholder="Попробуй ввести текст, например 'пять лет'">
+                <button class="btn-scan" onclick="startScan()">🔍 Сканировать посылку</button>
+                
+                <div class="scanner-machine" id="scannerMachine">
+                    <div class="laser" id="laserBeam"></div>
+                    <div class="data-box" id="dataBox">📦 Данные</div>
                 </div>
                 
-                <button class="btn-inspect" onclick="inspectData()">Отправить на проверку!</button>
-                
-                <div id="validationResult" class="validation-result"></div>
+                <div class="scan-result" id="scanRes"></div>
             </div>
         </div>
 
-        <!-- УРОВЕНЬ 3: СБОРКА КОДА -->
+        <!-- УРОВЕНЬ 3: Сборка Кода -->
         <div id="tab3" class="level-content">
-            <h2>Собери Класс с защитой! 👨‍💻</h2>
-            <p>Собери чертеж кота (Cat), который наследует защиту от инспектора (BaseModel). Перетаскивай блоки в правильном порядке!</p>
-            
-            <div class="workspace">
-                <div class="palette" id="palette">
-                    <h3>Блоки кода</h3>
-                    <div class="block" draggable="true" id="b2"><span class="code-keyword">class</span> Cat(BaseModel):</div>
-                    <div class="block" draggable="true" id="b4">&nbsp;&nbsp;&nbsp;&nbsp;age: <span class="code-type">int</span></div>
-                    <div class="block" draggable="true" id="b1"><span class="code-keyword">from</span> pydantic <span class="code-keyword">import</span> BaseModel</div>
-                    <div class="block" draggable="true" id="b3">&nbsp;&nbsp;&nbsp;&nbsp;name: <span class="code-type">str</span></div>
+            <div class="instruction">⚡ ЗАДАЧА: Собери Класс с броней BaseModel!</div>
+            <div class="code-workspace">
+                <div class="palette-code" id="codePal">
+                    <h3>Детали кода</h3>
+                    <div class="code-block" draggable="true" id="b2"><span class="c-kw">class</span> Cat(BaseModel):</div>
+                    <div class="code-block" draggable="true" id="b4">&nbsp;&nbsp;&nbsp;&nbsp;age: <span class="c-type">int</span></div>
+                    <div class="code-block" draggable="true" id="b1"><span class="c-kw">from</span> pydantic <span class="c-kw">import</span> BaseModel</div>
+                    <div class="code-block" draggable="true" id="b3">&nbsp;&nbsp;&nbsp;&nbsp;name: <span class="c-type">str</span></div>
                 </div>
-                
-                <div class="editor">
-                    <h3>Редактор Python</h3>
-                    <div class="drop-zone" data-expected="b1" data-hint="1. Импорт строгого инспектора">1. Импорт строгого инспектора</div>
-                    <div class="drop-zone" data-expected="b2" data-hint="2. Создаем Класс (Чертеж)">2. Создаем Класс (Чертеж)</div>
-                    <div class="drop-zone" data-expected="b3" data-hint="3. Свойство: имя (текст)">3. Свойство: имя (строка)</div>
-                    <div class="drop-zone" data-expected="b4" data-hint="4. Свойство: возраст (число)">4. Свойство: возраст (число)</div>
+                <div class="editor-code">
+                    <h3>Редактор</h3>
+                    <div class="drop-zone-code" data-expected="b1" data-hint="1. Импорт строгого инспектора">1. Импорт строгого инспектора</div>
+                    <div class="drop-zone-code" data-expected="b2" data-hint="2. Создаем Класс (Чертеж)">2. Создаем Класс (Чертеж)</div>
+                    <div class="drop-zone-code" data-expected="b3" data-hint="3. Свойство: имя (текст)">3. Свойство: имя (строка)</div>
+                    <div class="drop-zone-code" data-expected="b4" data-hint="4. Свойство: возраст (число)">4. Свойство: возраст (число)</div>
                 </div>
             </div>
-            
-            <button class="btn-check" onclick="checkClassCode()">Проверить чертеж! ▶️</button>
-            <div id="res3" class="validation-result"></div>
+            <button class="btn-check" onclick="checkClassCode()">УТВЕРДИТЬ ЧЕРТЕЖ ▶️</button>
+            <div id="resCode" class="res-msg"></div>
         </div>
     </div>
 
     <script>
-        // Переключение вкладок
-        function switchTab(num) {
-            document.querySelectorAll('.level-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab' + num).classList.add('active');
-            document.querySelectorAll('.tab-btn')[num - 1].classList.add('active');
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
         }
 
-        // --- УРОВЕНЬ 1: Создание объектов ---
-        const colors = ['#ffdd59', '#ff5e57', '#0fbcf9', '#0be881', '#d2dae2'];
-        let robotCount = 1;
-        function buildRobot() {
-            const conveyor = document.getElementById('conveyor');
+        // --- УРОВЕНЬ 1: 3D Принтер ---
+        let botCount = 0;
+        function printRobot() {
+            botCount++;
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
             const color = colors[Math.floor(Math.random() * colors.length)];
-            const robot = document.createElement('div');
-            robot.className = 'robot-obj';
-            robot.style.backgroundColor = color;
-            robot.innerHTML = `🤖 Робот-${robotCount}`;
-            conveyor.appendChild(robot);
-            robotCount++;
+            
+            const belt = document.getElementById('conveyor');
+            const bot = document.createElement('div');
+            bot.className = 'robot-instance';
+            bot.style.backgroundColor = color;
+            bot.innerText = `🤖 Робот-${botCount}`;
+            
+            belt.appendChild(bot);
         }
 
-        // --- УРОВЕНЬ 2: Валидация Pydantic ---
-        function inspectData() {
-            const name = document.getElementById('catName').value;
-            const age = document.getElementById('catAge').value;
-            const resBox = document.getElementById('validationResult');
-            resBox.style.display = 'block';
-
-            if (!age) {
-                resBox.innerHTML = "⚠️ Ошибка: Поле 'Возраст' не может быть пустым!";
-                resBox.style.backgroundColor = "#ffda79";
-                resBox.style.color = "#84817a";
-                return;
-            }
-
-            // Проверяем, является ли возраст чисто числом
-            if (isNaN(age) || age.trim() === "") {
-                resBox.innerHTML = `❌ Ошибка Pydantic (422 Unprocessable Entity)!<br><br>Поле 'age': Ожидалось целое число (int), а получено "${age}". Инспектор остановил программу!`;
-                resBox.style.backgroundColor = "#ff5e57";
-                resBox.style.color = "#fff";
-            } else {
-                resBox.innerHTML = `✅ Данные прошли проверку Pydantic!<br><br>Кота зовут ${name}, возраст ${age} – всё соответствует чертежу (BaseModel).`;
-                resBox.style.backgroundColor = "#0be881";
-                resBox.style.color = "#1e272e";
-            }
+        // --- УРОВЕНЬ 2: Таможня Pydantic ---
+        let isScanning = false;
+        function startScan() {
+            if(isScanning) return;
+            isScanning = true;
+            
+            const ageInput = document.getElementById('catAge').value;
+            const nameInput = document.getElementById('catName').value;
+            const box = document.getElementById('dataBox');
+            const laser = document.getElementById('laserBeam');
+            const res = document.getElementById('scanRes');
+            const machine = document.getElementById('scannerMachine');
+            const zone = document.getElementById('scannerZone');
+            
+            // Сброс
+            res.innerHTML = "";
+            machine.style.borderColor = "#777";
+            zone.style.animation = "";
+            
+            // Посылка выезжает
+            box.style.opacity = "1";
+            box.style.transform = "translateX(0)";
+            box.innerText = `📦 {name:"${nameInput}", age:"${ageInput}"}`;
+            
+            setTimeout(() => {
+                // Включаем лазер
+                laser.style.display = "block";
+                laser.style.animation = "scanAnim 1.5s linear";
+                
+                setTimeout(() => {
+                    laser.style.display = "none";
+                    laser.style.animation = "";
+                    
+                    // Проверка (валидация)
+                    if(isNaN(ageInput) || ageInput.trim() === "") {
+                        // ПРОВАЛ
+                        machine.style.borderColor = "#e74c3c";
+                        box.style.background = "#e74c3c";
+                        box.style.color = "#fff";
+                        box.innerText = "💥 ОШИБКА 422!";
+                        zone.style.animation = "shakeAlert 0.4s";
+                        res.innerHTML = "<span style='color:#e74c3c;'>❌ ТРЕВОГА! В поле 'Возраст' найден текст! Посылка уничтожена!</span>";
+                        
+                        setTimeout(() => {
+                            box.style.opacity = "0";
+                            box.style.transform = "translateX(-100px)";
+                            setTimeout(() => box.style.background = "#66fcf1", 500);
+                            isScanning = false;
+                        }, 2000);
+                        
+                    } else {
+                        // УСПЕХ
+                        machine.style.borderColor = "#2ecc71";
+                        res.innerHTML = "<span style='color:#2ecc71;'>✅ ПРОВЕРКА ПРОЙДЕНА! Возраст — это число.</span>";
+                        
+                        // Посылка уезжает дальше
+                        box.style.transform = "translateX(150px)";
+                        box.style.opacity = "0";
+                        
+                        setTimeout(() => {
+                            box.style.transform = "translateX(-100px)";
+                            isScanning = false;
+                        }, 1000);
+                    }
+                }, 1500); // время сканирования
+            }, 500); // время выезда коробки
         }
 
-        // --- УРОВЕНЬ 3: Drag & Drop ---
-        let draggedItem = null;
-
-        document.querySelectorAll('.block').forEach(block => {
-            block.addEventListener('dragstart', function() { draggedItem = this; });
+        // --- УРОВЕНЬ 3: Сборка Кода ---
+        let draggedBlock = null;
+        document.querySelectorAll('.code-block').forEach(b => {
+            b.addEventListener('dragstart', function() { draggedBlock = this; });
         });
 
-        document.querySelectorAll('.drop-zone, .palette').forEach(zone => {
-            zone.addEventListener('dragover', function(e) {
+        document.querySelectorAll('.drop-zone-code, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { e.preventDefault(); if(z.classList.contains('drop-zone-code')) z.classList.add('dragover'); });
+            z.addEventListener('dragleave', () => { if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover'); });
+            z.addEventListener('drop', e => {
                 e.preventDefault();
-                if(this.classList.contains('drop-zone')) this.classList.add('dragover');
-            });
-            
-            zone.addEventListener('dragleave', function() {
-                if(this.classList.contains('drop-zone')) this.classList.remove('dragover');
-            });
-            
-            zone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                if(this.classList.contains('drop-zone')) this.classList.remove('dragover');
+                if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
                 
-                // Возврат существующего блока в палитру
-                if (this.classList.contains('drop-zone') && this.children.length > 0) {
-                    let existingBlock = this.children[0];
-                    document.getElementById('palette').appendChild(existingBlock);
+                if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
+                    document.getElementById('codePal').appendChild(z.children[0]);
                 }
-                
-                if (draggedItem) {
-                    if (this.classList.contains('drop-zone')) this.innerHTML = ''; // Очистка подсказки
-                    this.appendChild(draggedItem);
+                if(draggedBlock && draggedBlock.classList.contains('code-block')) {
+                    if(z.classList.contains('drop-zone-code')) z.innerHTML = '';
+                    z.appendChild(draggedBlock);
                 }
-                
-                // Восстановление текста пустых зон
-                document.querySelectorAll('.drop-zone').forEach(dz => {
-                    if(dz.children.length === 0) dz.innerHTML = dz.getAttribute('data-hint');
-                });
             });
         });
 
-        // Проверка кода
         function checkClassCode() {
-            let correct = true;
-            let empty = false;
-            
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                if(zone.children.length === 0) {
-                    empty = true;
-                } else if (zone.children[0].id !== zone.getAttribute('data-expected')) {
-                    correct = false;
-                }
+            let correct = true, empty = false;
+            document.querySelectorAll('.drop-zone-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.id !== z.dataset.expected) correct = false;
             });
-
-            const res = document.getElementById('res3');
-            res.style.display = 'block';
-            
-            if (empty) {
-                res.innerHTML = "⚠️ Ошибка: Вы не расставили все блоки!";
-                res.style.backgroundColor = "#ffda79";
-                res.style.color = "#84817a";
-            } else if (correct) {
-                res.innerHTML = "✅ Идеально! Теперь твой чертеж (Class) защищен броней BaseModel, и никакой неправильный тип данных в него не пройдет!";
-                res.style.backgroundColor = "#0be881";
-                res.style.color = "#1e272e";
-            } else {
-                res.innerHTML = "❌ Ошибка в структуре. Сначала импортируем BaseModel, затем создаем класс, а внутри (с отступами) прописываем свойства!";
-                res.style.backgroundColor = "#ff5e57";
-                res.style.color = "#fff";
-            }
+            let r = document.getElementById('resCode');
+            r.style.display = 'block';
+            if(empty) { r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки!'; }
+            else if(correct) { r.style.background = '#45a29e'; r.style.color='#000'; r.innerText = '✅ УТВЕРЖДЕНО! Теперь этот чертеж защищен сканером BaseModel!'; }
+            else { r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка! Импорт -> Класс -> Свойства (с отступами).'; }
         }
     </script>
 </body>
