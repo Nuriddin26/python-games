@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Фабрика Функций 🏭</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #2c3e50; color: #ecf0f1; text-align: center; margin: 0; padding: 20px; }
+        h1 { color: #f1c40f; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        p { font-size: 18px; color: #bdc3c7; }
+        
+        .game-container { max-width: 1100px; margin: 0 auto; background: #34495e; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; border: 3px solid #2c3e50; }
+        .tabs { display: flex; background: #1a252f; }
+        .tab-btn { flex: 1; padding: 18px; font-size: 16px; font-weight: bold; border: none; background: #1a252f; color: #7f8c8d; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
+        .tab-btn.active { color: #fff; background-color: #34495e; border-bottom: 4px solid #3498db; }
+        .tab-btn:hover:not(.active) { background-color: #2c3e50; color: #ecf0f1; }
+        
+        .level-content { display: none; padding: 30px; animation: fadeIn 0.4s; text-align: left; }
+        .level-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Уровень 1 & 2: Виды функций */
+        .machine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .machine { background: #2c3e50; padding: 20px; border-radius: 10px; border: 2px dashed #3498db; position: relative; text-align: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.2); }
+        .machine h3 { color: #e74c3c; margin-top: 0; font-family: monospace; font-size: 20px; }
+        .machine-icon { font-size: 50px; margin: 10px 0; }
+        
+        .code-snippet { background: #1a252f; padding: 10px; border-radius: 5px; color: #2ecc71; font-family: monospace; font-size: 14px; text-align: left; margin-bottom: 15px; }
+        .code-keyword { color: #c678dd; } /* Фиолетовый для def, return */
+        .code-func { color: #61afef; } /* Синий для названий */
+        
+        .machine-controls { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .machine-input { padding: 8px; border-radius: 5px; border: none; font-size: 14px; text-align: center; width: 80%; }
+        .machine-btn { background: #3498db; color: #fff; border: none; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; width: 85%; }
+        .machine-btn:hover { background: #2980b9; transform: scale(1.05); }
+        
+        .machine-output { margin-top: 15px; padding: 10px; background: #ecf0f1; color: #2c3e50; border-radius: 5px; font-weight: bold; min-height: 20px; display: none; }
+
+        /* Уровень 3: Практика (Сборка кода) */
+        .workspace { display: flex; gap: 20px; margin-top: 20px; }
+        .palette, .editor { background: #2c3e50; padding: 20px; border-radius: 10px; width: 50%; }
+        .palette h3, .editor h3 { text-align: center; color: #f1c40f; margin-top: 0; }
+        
+        .block { background: #1a252f; border-left: 5px solid #3498db; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; user-select: none; color: #ecf0f1; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .block:active { cursor: grabbing; }
+        
+        .drop-zone { background: #34495e; border: 2px dashed #7f8c8d; min-height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #bdc3c7; transition: 0.2s; }
+        .drop-zone.dragover { background: #2c3e50; border-color: #f1c40f; }
+        .drop-zone .block { margin: 0; width: 100%; box-sizing: border-box; }
+
+        .btn-check { background: #2ecc71; color: #fff; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 20px; width: 100%; }
+        .btn-check:hover { background: #27ae60; transform: scale(1.02); }
+        
+        .result { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; text-align: center; font-size: 18px; }
+        .success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+    <h1>🏭 Фабрика Функций (DEF) 🏭</h1>
+    <p>Узнай, как программисты прячут тысячи строк кода в одну маленькую команду!</p>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(1)">1. Простые функции</button>
+            <button class="tab-btn" onclick="switchTab(2)">2. Умные функции (Return & Default)</button>
+            <button class="tab-btn" onclick="switchTab(3)">3. Сборка робота (Практика)</button>
+        </div>
+
+        <!-- УРОВЕНЬ 1: Ничего не принимает / Принимает, но не возвращает -->
+        <div id="tab1" class="level-content active">
+            <h2>Начальные станки на фабрике</h2>
+            <p>Функция начинается со слова <b>def</b> (define - определить). Это как кнопка, которая запускает сложный механизм.</p>
+            
+            <div class="machine-grid">
+                <!-- Тип 1 -->
+                <div class="machine">
+                    <div class="machine-icon">🎆</div>
+                    <h3>1. Скрытый механизм</h3>
+                    <p style="font-size: 13px;">Ничего не принимает, ничего не возвращает. Просто делает огромное действие внутри.</p>
+                    
+                    <div class="code-snippet">
+                        <span class="code-keyword">def</span> <span class="code-func">start_fireworks</span>():<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;print("Запускаем 100 ракет!")<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;print("Бабах!!!")
+                    </div>
+                    
+                    <div class="machine-controls">
+                        <button class="machine-btn" onclick="runMachine1()">Вызвать start_fireworks()</button>
+                    </div>
+                    <div id="out1" class="machine-output"></div>
+                </div>
+
+                <!-- Тип 2 -->
+                <div class="machine">
+                    <div class="machine-icon">🎨</div>
+                    <h3>2. Входная (Принимает)</h3>
+                    <p style="font-size: 13px;">Мы даем ей параметр (материал), и она делает с ним действие, но обратно ничего не отдает.</p>
+                    
+                    <div class="code-snippet">
+                        <span class="code-keyword">def</span> <span class="code-func">paint_car</span>(color):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;print(f"Машина покрашена в {color}!")
+                    </div>
+                    
+                    <div class="machine-controls">
+                        <input type="text" id="colorInput" class="machine-input" placeholder="Введите цвет (напр. Красный)">
+                        <button class="machine-btn" onclick="runMachine2()" style="background: #e67e22;">Вызвать paint_car(цвет)</button>
+                    </div>
+                    <div id="out2" class="machine-output"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Возврат (Return) и Параметры по умолчанию -->
+        <div id="tab2" class="level-content">
+            <h2>Продвинутые станки (Return)</h2>
+            <p>Самые полезные функции — те, которые обрабатывают данные и <b>возвращают</b> (return) результат нам в руки!</p>
+
+            <div class="machine-grid">
+                <!-- Тип 3 -->
+                <div class="machine">
+                    <div class="machine-icon">⚙️</div>
+                    <h3>3. Входно-Выходная</h3>
+                    <p style="font-size: 13px;">Берет число, делает математику и выплевывает результат обратно с помощью <b>return</b>.</p>
+                    
+                    <div class="code-snippet">
+                        <span class="code-keyword">def</span> <span class="code-func">double_it</span>(number):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;result = number * 2<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> result
+                    </div>
+                    
+                    <div class="machine-controls">
+                        <input type="number" id="mathInput" class="machine-input" placeholder="Введите число (напр. 5)">
+                        <button class="machine-btn" onclick="runMachine3()" style="background: #9b59b6;">Вызвать double_it(число)</button>
+                    </div>
+                    <div id="out3" class="machine-output"></div>
+                </div>
+
+                <!-- Тип 4 -->
+                <div class="machine">
+                    <div class="machine-icon">☕</div>
+                    <h3>4. По умолчанию (Default)</h3>
+                    <p style="font-size: 13px;">Если мы забудем сказать функции, сколько нужно сахара, она возьмет значение по умолчанию!</p>
+                    
+                    <div class="code-snippet">
+                        <span class="code-keyword">def</span> <span class="code-func">make_coffee</span>(sugar=0):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> f"Кофе готов. Сахар: {sugar}"
+                    </div>
+                    
+                    <div class="machine-controls">
+                        <input type="number" id="sugarInput" class="machine-input" placeholder="Сахар (оставь пустым для default)">
+                        <button class="machine-btn" onclick="runMachine4()" style="background: #27ae60;">Вызвать make_coffee()</button>
+                    </div>
+                    <div id="out4" class="machine-output"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 3: СБОРКА КОДА -->
+        <div id="tab3" class="level-content">
+            <h2>Собери функцию сам! 👨‍💻</h2>
+            <p>Напиши Входно-Выходную функцию, которая принимает имя робота, собирает его и <b>возвращает (return)</b> готовую строку.</p>
+            
+            <div class="workspace">
+                <div class="palette" id="palette">
+                    <h3>Блоки кода</h3>
+                    <div class="block" draggable="true" id="b3">&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> my_robot</div>
+                    <div class="block" draggable="true" id="b1"><span class="code-keyword">def</span> <span class="code-func">build_robot</span>(name):</div>
+                    <div class="block" draggable="true" id="b2">&nbsp;&nbsp;&nbsp;&nbsp;my_robot = "Робот " + name + " собран!"</div>
+                </div>
+                
+                <div class="editor">
+                    <h3>Редактор Python</h3>
+                    <div class="drop-zone" data-expected="b1" data-hint="1. Создай функцию (def)">1. Создай функцию (def)</div>
+                    <div class="drop-zone" data-expected="b2" data-hint="2. Логика (собираем строку)">2. Логика (собираем строку)</div>
+                    <div class="drop-zone" data-expected="b3" data-hint="3. Возвращаем результат (return)">3. Возвращаем результат (return)</div>
+                </div>
+            </div>
+            
+            <button class="btn-check" onclick="checkFunctionCode()">Запустить конвейер! ▶️</button>
+            <div id="res3" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Переключение вкладок
+        function switchTab(num) {
+            document.querySelectorAll('.level-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab' + num).classList.add('active');
+            document.querySelectorAll('.tab-btn')[num - 1].classList.add('active');
+        }
+
+        // --- Логика машин (Уровни 1 и 2) ---
+        function runMachine1() {
+            const out = document.getElementById('out1');
+            out.style.display = 'block';
+            out.innerHTML = "🎇 Запускаем 100 ракет...<br>💥 БАБАХ!!! Огромный код выполнен!";
+            out.style.background = "#fff3cd";
+        }
+
+        function runMachine2() {
+            let color = document.getElementById('colorInput').value;
+            if(!color) color = "Невидимый";
+            const out = document.getElementById('out2');
+            out.style.display = 'block';
+            out.innerHTML = `🎨 Вжиииих! Машина покрашена в <b>${color}</b> цвет!`;
+            out.style.background = "#d1ecf1";
+        }
+
+        function runMachine3() {
+            let num = document.getElementById('mathInput').value;
+            const out = document.getElementById('out3');
+            out.style.display = 'block';
+            if(!num) {
+                out.innerHTML = "⚠️ Ошибка: Функция просит число (Аргумент)!";
+                out.style.background = "#f8d7da";
+                return;
+            }
+            out.innerHTML = `📥 Взяли: ${num}<br>📤 Функция ВЕРНУЛА (return): <b>${num * 2}</b>`;
+            out.style.background = "#d4edda";
+        }
+
+        function runMachine4() {
+            let sugar = document.getElementById('sugarInput').value;
+            const out = document.getElementById('out4');
+            out.style.display = 'block';
+            if(sugar === "") {
+                out.innerHTML = `☕ Вы не указали сахар!<br>Сработал Default: <b>Кофе прямо в чашке, сахар: 0</b>`;
+                out.style.background = "#e2e3e5";
+            } else {
+                out.innerHTML = `☕ Кофе готов!<br>Вы передали аргумент. Сахар: <b>${sugar}</b>`;
+                out.style.background = "#d4edda";
+            }
+        }
+
+        // --- Логика Drag & Drop (Уровень 3) ---
+        let draggedItem = null;
+
+        document.querySelectorAll('.block').forEach(block => {
+            block.addEventListener('dragstart', function() {
+                draggedItem = this;
+            });
+        });
+
+        document.querySelectorAll('.drop-zone, .palette').forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                if(this.classList.contains('drop-zone')) this.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragleave', function() {
+                if(this.classList.contains('drop-zone')) this.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if(this.classList.contains('drop-zone')) this.classList.remove('dragover');
+                
+                // Возврат существующего блока в палитру
+                if (this.classList.contains('drop-zone') && this.children.length > 0) {
+                    let existingBlock = this.children[0];
+                    document.getElementById('palette').appendChild(existingBlock);
+                }
+                
+                if (draggedItem) {
+                    if (this.classList.contains('drop-zone')) {
+                        this.innerHTML = ''; // Очистка текста-подсказки
+                    }
+                    this.appendChild(draggedItem);
+                }
+                
+                // Восстановление текста пустых зон
+                document.querySelectorAll('.drop-zone').forEach(dz => {
+                    if(dz.children.length === 0) {
+                        dz.innerHTML = dz.getAttribute('data-hint');
+                    }
+                });
+            });
+        });
+
+        // Проверка кода
+        function checkFunctionCode() {
+            let correct = true;
+            let empty = false;
+            
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                if(zone.children.length === 0) {
+                    empty = true;
+                } else if (zone.children[0].id !== zone.getAttribute('data-expected')) {
+                    correct = false;
+                }
+            });
+
+            const res = document.getElementById('res3');
+            res.style.display = 'block';
+            
+            if (empty) {
+                res.className = 'result error';
+                res.innerHTML = "⚠️ Ошибка: Вы не расставили все блоки!";
+            } else if (correct) {
+                res.className = 'result success';
+                res.innerHTML = "✅ Идеально! Функция собрана правильно! Сначала определяем (def), потом пишем логику с отступами, а в конце отдаем результат (return).";
+            } else {
+                res.className = 'result error';
+                res.innerHTML = "❌ Ошибка логики. Вспомните правило: def на самом верху, а return — это всегда самая последняя команда в функции, она 'выплевывает' результат и завершает работу!";
+            }
+        }
+    </script>
+</body>
+</html>

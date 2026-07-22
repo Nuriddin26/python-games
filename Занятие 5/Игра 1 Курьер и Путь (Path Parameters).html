@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Уровень 1: Путь (Path) 🚚</title>
+    <style>
+        body { font-family: sans-serif; background: #1e1e2f; color: #fff; text-align: center; padding: 20px; }
+        h1 { color: #00d2ff; }
+        .container { display: flex; gap: 20px; justify-content: center; text-align: left; max-width: 1000px; margin: auto; }
+        .theory, .practice { background: #2a2a40; padding: 20px; border-radius: 10px; width: 50%; border: 2px solid #3f3f5a; }
+        .theory h2 { color: #ffeb3b; }
+        .url-box { background: #111; padding: 10px; color: #00ff00; font-family: monospace; border-radius: 5px; }
+        .palette { display: flex; flex-direction: column; gap: 10px; min-height: 50px; background: #1a1a2e; padding: 15px; border-radius: 5px;}
+        .code-block { background: #282c34; border-left: 5px solid #00d2ff; padding: 10px; cursor: grab; font-family: monospace; border-radius: 5px; user-select: none; }
+        .drop-zone { background: #1a1a2e; border: 2px dashed #6c6c86; height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #555; }
+        .drop-zone .code-block { width: 100%; margin: 0; }
+        button { background: #00d2ff; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; font-size: 16px;}
+        .result { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Уровень 1: Параметры Пути (Path) 🚚</h1>
+    <div class="container">
+        <div class="theory">
+            <h2>Как это работает в жизни?</h2>
+            <p>Представь курьера. Ему дают четкий адрес: <b>Улица -> Дом -> Квартира</b>.</p>
+            <p>В интернете курьер — это сервер. А адрес — это URL. Мы передаем данные прямо в адресе (пути), чтобы курьер знал, какой именно фрукт мы хотим съесть!</p>
+            <div class="url-box">http://127.0.0.1:8000/eat/<span style="color:red">яблоко</span></div>
+            <p>Здесь <span style="color:red">яблоко</span> — это и есть параметр пути!</p>
+        </div>
+        <div class="practice">
+            <h2>Собери сервер доставки:</h2>
+            <div class="palette" id="palette">
+                <div class="code-block" draggable="true" id="b3">@app.get("/eat/{fruit}")</div>
+                <div class="code-block" draggable="true" id="b1">from fastapi import FastAPI</div>
+                <div class="code-block" draggable="true" id="b5">&nbsp;&nbsp;&nbsp;&nbsp;return f"Ты съел {fruit}!"</div>
+                <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
+                <div class="code-block" draggable="true" id="b4">def eat_fruit(fruit: str):</div>
+            </div>
+            <h3>Твой код:</h3>
+            <div class="drop-zone" data-expected="b1">Импорт библиотеки</div>
+            <div class="drop-zone" data-expected="b2">Создание приложения</div>
+            <div class="drop-zone" data-expected="b3">Маршрут (адрес)</div>
+            <div class="drop-zone" data-expected="b4">Функция</div>
+            <div class="drop-zone" data-expected="b5">Ответ сервера (с отступом!)</div>
+            
+            <button onclick="check()">Проверить код ▶️</button>
+            <div id="res" class="result"></div>
+        </div>
+    </div>
+    <script>
+        let dragged;
+        document.addEventListener('dragstart', e => dragged = e.target);
+        document.querySelectorAll('.drop-zone, .palette').forEach(zone => {
+            zone.addEventListener('dragover', e => e.preventDefault());
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                if (zone.classList.contains('drop-zone') && zone.children.length > 0) {
+                    document.getElementById('palette').appendChild(zone.children[0]);
+                }
+                if (dragged) zone.appendChild(dragged);
+            });
+        });
+
+        function check() {
+            let correct = true, empty = false;
+            document.querySelectorAll('.drop-zone').forEach(z => {
+                if (!z.firstElementChild) empty = true;
+                else if (z.firstElementChild.id !== z.dataset.expected) correct = false;
+            });
+            const r = document.getElementById('res');
+            r.style.display = 'block';
+            if (empty) { r.className = 'result error'; r.innerHTML = '⚠️ Расставь все блоки!'; }
+            else if (correct) { r.className = 'result success'; r.innerHTML = '✅ Отлично! Сервер готов принимать фрукты!'; }
+            else { r.className = 'result error'; r.innerHTML = '❌ Ошибка в коде. Вспомни структуру: импорт -> апп -> декоратор -> функция -> return.'; }
+        }
+    </script>
+</body>
+</html>
