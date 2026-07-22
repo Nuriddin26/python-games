@@ -2,79 +2,222 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Уровень 1: Путь (Path) 🚚</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Экшн-Доставка (Path) 🚚</title>
     <style>
-        body { font-family: sans-serif; background: #1e1e2f; color: #fff; text-align: center; padding: 20px; }
-        h1 { color: #00d2ff; }
-        .container { display: flex; gap: 20px; justify-content: center; text-align: left; max-width: 1000px; margin: auto; }
-        .theory, .practice { background: #2a2a40; padding: 20px; border-radius: 10px; width: 50%; border: 2px solid #3f3f5a; }
-        .theory h2 { color: #ffeb3b; }
-        .url-box { background: #111; padding: 10px; color: #00ff00; font-family: monospace; border-radius: 5px; }
-        .palette { display: flex; flex-direction: column; gap: 10px; min-height: 50px; background: #1a1a2e; padding: 15px; border-radius: 5px;}
-        .code-block { background: #282c34; border-left: 5px solid #00d2ff; padding: 10px; cursor: grab; font-family: monospace; border-radius: 5px; user-select: none; }
-        .drop-zone { background: #1a1a2e; border: 2px dashed #6c6c86; height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #555; }
-        .drop-zone .code-block { width: 100%; margin: 0; }
-        button { background: #00d2ff; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; font-size: 16px;}
-        .result { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0c10; color: #c5c6c7; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #66fcf1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5); }
+        
+        .game-container { max-width: 1000px; margin: 0 auto; background: #1f2833; border-radius: 15px; box-shadow: 0 0 20px rgba(102, 252, 241, 0.2); border: 2px solid #45a29e; overflow: hidden; }
+        .tabs { display: flex; background: #0b0c10; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0b0c10; color: #777; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: #fff; background-color: #1f2833; border-bottom: 4px solid #66fcf1; }
+        .tab-btn:hover:not(.active) { background-color: #1a2028; color: #ccc; }
+        
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
+        .level-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .instruction { font-size: 22px; color: #45a29e; font-weight: bold; margin-bottom: 20px; }
+
+        /* УРОВЕНЬ 1: Экшн-Доставка */
+        .action-zone { background: #0b0c10; padding: 30px; border-radius: 10px; border: 2px dashed #45a29e; margin-top: 20px; position: relative; overflow: hidden; }
+        
+        .url-bar { background: #1a2028; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 24px; color: #fff; border: 1px solid #45a29e; margin-bottom: 20px; text-align: left; display: flex; align-items: center; justify-content: center;}
+        .url-base { color: #888; }
+        .url-param { color: #e74c3c; font-weight: bold; text-shadow: 0 0 10px rgba(231, 76, 60, 0.5); }
+        
+        .input-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .fruit-input { padding: 12px 20px; font-size: 18px; border-radius: 8px; border: 2px solid #66fcf1; background: #1f2833; color: #fff; outline: none; text-align: center; width: 300px; }
+        
+        .btn-action { background: #45a29e; color: #000; font-weight: bold; font-size: 18px; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-action:hover { background: #66fcf1; box-shadow: 0 0 15px rgba(102, 252, 241, 0.5); transform: scale(1.05); }
+        
+        .road { height: 100px; background: #111; border-top: 2px dashed #555; border-bottom: 2px dashed #555; position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .house { font-size: 50px; z-index: 2; }
+        .truck { font-size: 50px; position: absolute; left: 20px; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3; }
+        
+        .server-response { margin-top: 20px; font-size: 24px; font-weight: bold; color: #2ecc71; opacity: 0; transition: 0.5s; font-family: monospace; }
+
+        /* УРОВЕНЬ 2: Сборка Кода */
+        .code-workspace { display: flex; gap: 20px; text-align: left; margin-top: 20px; }
+        .palette-code, .editor-code { background: #0b0c10; padding: 20px; border-radius: 10px; width: 50%; border: 1px solid #45a29e; }
+        .palette-code h3, .editor-code h3 { color: #45a29e; margin-top: 0; text-align: center; }
+        .code-block { background: #1f2833; border-left: 5px solid #66fcf1; padding: 15px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .code-block:active { cursor: grabbing; }
+        .c-kw { color: #c678dd; } .c-func { color: #61afef; } .c-str { color: #98c379; }
+        
+        .drop-zone-code { background: #111; border: 2px dashed #45a29e; height: 50px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 14px; transition: 0.2s; }
+        .drop-zone-code.dragover { border-color: #66fcf1; background: rgba(102,252,241,0.1); }
+        .drop-zone-code .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        
+        .btn-check { background: #66fcf1; color: #000; border: none; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; text-transform: uppercase; }
+        .btn-check:hover { background: #45a29e; color: #fff; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
-    <h1>Уровень 1: Параметры Пути (Path) 🚚</h1>
-    <div class="container">
-        <div class="theory">
-            <h2>Как это работает в жизни?</h2>
-            <p>Представь курьера. Ему дают четкий адрес: <b>Улица -> Дом -> Квартира</b>.</p>
-            <p>В интернете курьер — это сервер. А адрес — это URL. Мы передаем данные прямо в адресе (пути), чтобы курьер знал, какой именно фрукт мы хотим съесть!</p>
-            <div class="url-box">http://127.0.0.1:8000/eat/<span style="color:red">яблоко</span></div>
-            <p>Здесь <span style="color:red">яблоко</span> — это и есть параметр пути!</p>
+
+    <h1>🚚 Экшн-Доставка (Параметры Пути) 🚚</h1>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(1)">1. Тест: Адрес в URL</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Сборка Сервера</button>
         </div>
-        <div class="practice">
-            <h2>Собери сервер доставки:</h2>
-            <div class="palette" id="palette">
-                <div class="code-block" draggable="true" id="b3">@app.get("/eat/{fruit}")</div>
-                <div class="code-block" draggable="true" id="b1">from fastapi import FastAPI</div>
-                <div class="code-block" draggable="true" id="b5">&nbsp;&nbsp;&nbsp;&nbsp;return f"Ты съел {fruit}!"</div>
-                <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
-                <div class="code-block" draggable="true" id="b4">def eat_fruit(fruit: str):</div>
-            </div>
-            <h3>Твой код:</h3>
-            <div class="drop-zone" data-expected="b1">Импорт библиотеки</div>
-            <div class="drop-zone" data-expected="b2">Создание приложения</div>
-            <div class="drop-zone" data-expected="b3">Маршрут (адрес)</div>
-            <div class="drop-zone" data-expected="b4">Функция</div>
-            <div class="drop-zone" data-expected="b5">Ответ сервера (с отступом!)</div>
+
+        <!-- УРОВЕНЬ 1: Экшн-Доставка -->
+        <div id="tab1" class="level-content active">
+            <div class="instruction">⚡ ЗАДАЧА: Накорми сервер любимым фруктом!</div>
+            <p style="color: #aaa; margin-bottom: 20px;">Параметр пути — это часть адреса. Напиши слово, и оно мгновенно станет концом маршрута для нашего курьера[cite: 10]!</p>
             
-            <button onclick="check()">Проверить код ▶️</button>
-            <div id="res" class="result"></div>
+            <div class="action-zone">
+                <div class="url-bar">
+                    <span class="url-base">http://127.0.0.1:8000/eat/</span><span class="url-param" id="urlParam">{fruit}</span>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="fruitInput" class="fruit-input" placeholder="Напиши фрукт (напр. Банан)" oninput="updateUrl()">
+                    <button class="btn-action" onclick="sendCourier()">Отправить 🚚</button>
+                </div>
+                
+                <div class="road">
+                    <div style="font-size: 50px; z-index: 2; opacity: 0.5;">🌐</div>
+                    <div class="truck" id="truck">🚚💨</div>
+                    <div class="house">🏠</div>
+                </div>
+                
+                <div class="server-response" id="serverResponse"></div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Сборка Кода -->
+        <div id="tab2" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Собери сервер, который примет курьера!</div>
+            
+            <div class="code-workspace">
+                <div class="palette-code" id="codePal">
+                    <h3>Детали кода</h3>
+                    <div class="code-block" draggable="true" id="b3"><span class="c-kw">@app.get</span>(<span class="c-str">"/eat/{fruit}"</span>)</div>
+                    <div class="code-block" draggable="true" id="b1"><span class="c-kw">from</span> fastapi <span class="c-kw">import</span> FastAPI</div>
+                    <div class="code-block" draggable="true" id="b5">&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-str">f"Ты съел {fruit}!"</span></div>
+                    <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
+                    <div class="code-block" draggable="true" id="b4"><span class="c-kw">def</span> <span class="c-func">eat_fruit</span>(fruit: <span class="c-kw">str</span>):</div>
+                </div>
+                
+                <div class="editor-code">
+                    <h3>Редактор Python</h3>
+                    <div class="drop-zone-code" data-expected="b1" data-hint="1. Импорт библиотеки">1. Импорт библиотеки[cite: 10]</div>
+                    <div class="drop-zone-code" data-expected="b2" data-hint="2. Создание приложения">2. Создание приложения[cite: 10]</div>
+                    <div class="drop-zone-code" data-expected="b3" data-hint="3. Маршрут (адрес с переменной)">3. Маршрут (адрес с переменной)[cite: 10]</div>
+                    <div class="drop-zone-code" data-expected="b4" data-hint="4. Функция (принимает переменную)">4. Функция (принимает переменную)[cite: 10]</div>
+                    <div class="drop-zone-code" data-expected="b5" data-hint="5. Ответ сервера">5. Ответ сервера[cite: 10]</div>
+                </div>
+            </div>
+            <button class="btn-check" onclick="checkServerCode()">АКТИВИРОВАТЬ СЕРВЕР ▶️</button>
+            <div id="resCode" class="res-msg"></div>
         </div>
     </div>
+
     <script>
-        let dragged;
-        document.addEventListener('dragstart', e => dragged = e.target);
-        document.querySelectorAll('.drop-zone, .palette').forEach(zone => {
-            zone.addEventListener('dragover', e => e.preventDefault());
-            zone.addEventListener('drop', e => {
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
+        }
+
+        // --- УРОВЕНЬ 1: Экшн-Доставка ---
+        function updateUrl() {
+            const val = document.getElementById('fruitInput').value;
+            const param = document.getElementById('urlParam');
+            if(val.trim() === "") {
+                param.innerText = "{fruit}";
+                param.style.color = "#e74c3c";
+            } else {
+                param.innerText = val;
+                param.style.color = "#2ecc71"; // Зеленый при вводе
+            }
+        }
+
+        let isDelivering = false;
+        function sendCourier() {
+            if(isDelivering) return;
+            const val = document.getElementById('fruitInput').value.trim();
+            const res = document.getElementById('serverResponse');
+            
+            if(!val) {
+                res.innerText = "⚠️ Ошибка 404: Ты не указал фрукт в адресе!";
+                res.style.color = "#e74c3c";
+                res.style.opacity = "1";
+                return;
+            }
+
+            isDelivering = true;
+            res.style.opacity = "0"; // Прячем прошлый ответ
+            
+            const truck = document.getElementById('truck');
+            // Анимация движения курьера
+            truck.style.left = "calc(100% - 100px)"; 
+            
+            setTimeout(() => {
+                // Доехал
+                res.innerText = `✅ Сервер: "Ты съел ${val}!"`;
+                res.style.color = "#2ecc71";
+                res.style.opacity = "1";
+                
+                // Возврат грузовика
+                setTimeout(() => {
+                    truck.style.transition = "0s"; // Отключаем плавность для мгновенного возврата
+                    truck.style.left = "20px";
+                    setTimeout(() => {
+                        truck.style.transition = "1s cubic-bezier(0.4, 0, 0.2, 1)"; // Возвращаем плавность
+                        isDelivering = false;
+                    }, 50);
+                }, 1500);
+            }, 1000);
+        }
+
+        // --- УРОВЕНЬ 2: Сборка Кода ---
+        let draggedBlock = null;
+        document.querySelectorAll('.code-block').forEach(b => {
+            b.addEventListener('dragstart', function() { draggedBlock = this; });
+        });
+
+        document.querySelectorAll('.drop-zone-code, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { e.preventDefault(); if(z.classList.contains('drop-zone-code')) z.classList.add('dragover'); });
+            z.addEventListener('dragleave', () => { if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover'); });
+            z.addEventListener('drop', e => {
                 e.preventDefault();
-                if (zone.classList.contains('drop-zone') && zone.children.length > 0) {
-                    document.getElementById('palette').appendChild(zone.children[0]);
+                if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
+                
+                if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
+                    document.getElementById('codePal').appendChild(z.children[0]);
                 }
-                if (dragged) zone.appendChild(dragged);
+                if(draggedBlock && draggedBlock.classList.contains('code-block')) {
+                    if(z.classList.contains('drop-zone-code')) z.innerHTML = '';
+                    z.appendChild(draggedBlock);
+                }
             });
         });
 
-        function check() {
+        function checkServerCode() {
             let correct = true, empty = false;
-            document.querySelectorAll('.drop-zone').forEach(z => {
-                if (!z.firstElementChild) empty = true;
-                else if (z.firstElementChild.id !== z.dataset.expected) correct = false;
+            document.querySelectorAll('.drop-zone-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.id !== z.dataset.expected) correct = false;
             });
-            const r = document.getElementById('res');
+            
+            let r = document.getElementById('resCode');
             r.style.display = 'block';
-            if (empty) { r.className = 'result error'; r.innerHTML = '⚠️ Расставь все блоки!'; }
-            else if (correct) { r.className = 'result success'; r.innerHTML = '✅ Отлично! Сервер готов принимать фрукты!'; }
-            else { r.className = 'result error'; r.innerHTML = '❌ Ошибка в коде. Вспомни структуру: импорт -> апп -> декоратор -> функция -> return.'; }
+            
+            if(empty) { 
+                r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки на места!'; 
+            } else if(correct) { 
+                r.style.background = '#45a29e'; r.style.color='#000'; r.innerText = '✅ ИДЕАЛЬНО! Сервер запущен и готов принимать параметры прямо из адресной строки!'; 
+            } else { 
+                r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка в структуре! Импорт -> app -> Декоратор -> Функция -> return.'; 
+            }
         }
     </script>
 </body>
