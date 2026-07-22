@@ -3,295 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра: Склад Переменных 📦</title>
+    <title>Игра: Экшн-Склад Переменных 📦</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: #fff; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #f9a826; text-transform: uppercase; letter-spacing: 2px; }
-        p { font-size: 18px; color: #b3b3cc; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: #fff; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #f9a826; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
         
-        .game-container { max-width: 1000px; margin: 0 auto; background: #16213e; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); border: 2px solid #0f3460; overflow: hidden; }
-        .tabs { display: flex; background: #0f3460; }
-        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0f3460; color: #8fa1c4; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
-        .tab-btn.active { color: #fff; background-color: #1a1a2e; border-bottom: 4px solid #e94560; }
-        .tab-btn:hover:not(.active) { background-color: #16213e; }
+        .game-container { max-width: 1000px; margin: 0 auto; background: #222; border-radius: 15px; box-shadow: 0 0 20px rgba(249, 168, 38, 0.2); border: 2px solid #444; overflow: hidden; }
+        .tabs { display: flex; background: #333; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #333; color: #888; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: #fff; background-color: #222; border-bottom: 4px solid #f9a826; }
+        .tab-btn:hover:not(.active) { background-color: #444; }
         
-        .level-content { display: none; padding: 30px; animation: fadeIn 0.4s; text-align: left; }
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
         .level-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        /* Уровень 1: Создание коробки */
-        .box-creator { display: flex; gap: 20px; align-items: center; justify-content: center; background: #0f3460; padding: 20px; border-radius: 10px; }
-        .input-group input { padding: 10px; border-radius: 5px; border: none; font-size: 16px; margin-top: 5px; }
-        .box-visual { width: 200px; height: 200px; background: #e94560; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 -20px 0 rgba(0,0,0,0.2); transition: 0.3s; }
-        .box-label { background: #fff; color: #000; padding: 5px 15px; border-radius: 3px; font-family: monospace; font-weight: bold; margin-bottom: 20px; }
-        .box-value { font-size: 40px; }
+        .instruction { font-size: 22px; color: #00d2ff; font-weight: bold; margin-bottom: 20px; }
 
-        /* Уровень 2: Типы данных (Drag and Drop) */
-        .sorter-container { display: flex; justify-content: space-between; gap: 20px; margin-top: 20px; }
-        .draggables { display: flex; flex-wrap: wrap; gap: 10px; width: 30%; align-content: flex-start; }
-        .item { background: #f9a826; color: #000; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: grab; font-family: monospace; }
-        .buckets { display: flex; flex-wrap: wrap; gap: 15px; width: 65%; }
-        .bucket { background: #1a1a2e; border: 3px dashed #8fa1c4; border-radius: 10px; width: 45%; min-height: 120px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .bucket h3 { margin: 5px 0; color: #e94560; font-family: monospace; }
-        .bucket.dragover { border-color: #f9a826; background: #0f3460; }
-        .bucket .item { margin-top: 5px; width: 80%; text-align: center; }
-
-        /* Уровень 3: Размер памяти */
-        .memory-compare { display: flex; gap: 30px; justify-content: center; margin-top: 20px; }
-        .lang-card { background: #0f3460; padding: 20px; border-radius: 10px; width: 45%; text-align: center; }
-        .memory-box { margin: 20px auto; background: #4CAF50; height: 60px; border-radius: 5px; transition: width 0.5s ease-in-out; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
-        .memory-box.broken { background: #ff4c4c !important; }
+        /* УРОВЕНЬ 1: Упаковка */
+        .factory-zone { display: flex; gap: 20px; justify-content: center; align-items: center; }
+        .control-panel { background: #333; padding: 20px; border-radius: 10px; border: 2px dashed #f9a826; }
+        .control-panel input { display: block; width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; font-size: 16px; font-family: monospace; }
+        .btn-pack { background: #f9a826; color: #000; font-weight: bold; font-size: 18px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-pack:hover { transform: scale(1.1); }
         
-        /* Уровень 4: Сборка кода */
-        .code-workspace { display: flex; gap: 20px; margin-top: 20px; }
-        .palette, .editor { background: #0f3460; padding: 20px; border-radius: 10px; width: 50%; }
-        .code-block { background: #282c34; border-left: 5px solid #f9a826; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; user-select: none; color: #abb2bf; }
-        .drop-zone { background: #1a1a2e; border: 2px dashed #8fa1c4; height: 50px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #666; }
-        .drop-zone .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        .conveyor { width: 300px; height: 200px; background: #111; border-bottom: 10px solid #555; position: relative; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; border-radius: 10px; }
+        .box-anim { width: 120px; height: 120px; background: #e94560; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: -150px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: inset 0 -15px 0 rgba(0,0,0,0.3); }
+        .box-anim .lbl { background: #fff; color: #000; padding: 2px 8px; font-weight: bold; font-family: monospace; font-size: 14px; border-radius: 3px; position: absolute; top: 10px; }
+        .box-anim .val { font-size: 35px; margin-top: 15px; }
+
+        /* УРОВЕНЬ 2: Сортировка */
+        .sort-game { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .spawn-zone { min-height: 60px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; background: #333; padding: 15px; border-radius: 10px; width: 100%; border: 2px solid #555; }
+        .drag-item { background: #f9a826; color: #000; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-family: monospace; font-size: 18px; cursor: grab; user-select: none; transition: transform 0.1s; }
+        .drag-item:active { cursor: grabbing; transform: scale(0.9); }
         
-        .btn { background: #e94560; color: #fff; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 20px; width: 100%; }
-        .btn:hover { background: #c8324a; transform: scale(1.02); }
-        .result { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; text-align: center; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        .buckets { display: flex; gap: 15px; width: 100%; justify-content: center; }
+        .bucket { flex: 1; background: #111; border: 3px dashed #555; border-radius: 10px; min-height: 150px; display: flex; flex-direction: column; align-items: center; padding: 10px; transition: 0.2s; }
+        .bucket h3 { margin: 0 0 10px 0; color: #00d2ff; }
+        .bucket.dragover { border-color: #00d2ff; background: #222; transform: scale(1.05); }
+
+        /* УРОВЕНЬ 3: Краш-тест (Память) */
+        .crash-zone { display: flex; justify-content: space-around; align-items: center; margin-top: 20px; }
+        .heavy-weight { background: #555; border: 4px solid #fff; border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; cursor: grab; z-index: 10; box-shadow: 0 10px 0 #333; }
+        .heavy-weight:active { cursor: grabbing; box-shadow: 0 2px 0 #333; transform: translateY(8px); }
+        
+        .test-box { width: 150px; height: 100px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-weight: bold; font-size: 18px; transition: 0.3s; position: relative; }
+        .c-box { background: #607d8b; border: 5px solid #455a64; }
+        .py-box { background: #4CAF50; border: 5px solid #388E3C; }
+        
+        .test-box.broken { background: #e53935 !important; border-color: #b71c1c !important; transform: scale(1.1) rotate(5deg); }
+        .test-box.stretched { width: 300px !important; background: #81C784; }
+
+        .drop-target-mem { position: absolute; inset: 0; }
+
+        /* УРОВЕНЬ 4: Сборка */
+        .code-workspace { display: flex; gap: 20px; text-align: left; }
+        .palette-code, .editor-code { background: #333; padding: 20px; border-radius: 10px; width: 50%; }
+        .code-block { background: #282c34; border-left: 5px solid #f9a826; padding: 15px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #abb2bf; font-size: 18px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .drop-zone-code { background: #111; border: 2px dashed #666; height: 55px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #666; font-size: 14px; transition: 0.2s; }
+        .drop-zone-code.dragover { border-color: #f9a826; background: #222; }
+        .drop-zone-code .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        .btn-check { background: #00d2ff; color: #000; border: none; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; }
+        .btn-check:hover { background: #00a8cc; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <h1>📦 Склад Переменных 📦</h1>
-    <p>Узнай, как компьютер хранит информацию!</p>
+    <h1>🤖 Экшн-Склад Переменных 🤖</h1>
 
     <div class="game-container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab(1)">1. Суть переменной</button>
-            <button class="tab-btn" onclick="openTab(2)">2. Типы данных</button>
-            <button class="tab-btn" onclick="openTab(3)">3. Размер (Память)</button>
-            <button class="tab-btn" onclick="openTab(4)">4. Практика (Код)</button>
+            <button class="tab-btn active" onclick="openTab(1)">1. Сборка</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Сортировка</button>
+            <button class="tab-btn" onclick="openTab(3)">3. Краш-тест</button>
+            <button class="tab-btn" onclick="openTab(4)">4. Код</button>
         </div>
 
-        <!-- УРОВЕНЬ 1: Что такое переменная? -->
+        <!-- УРОВЕНЬ 1 -->
         <div id="tab1" class="level-content active">
-            <h2>Переменная — это коробка! 📦</h2>
-            <p>Чтобы компьютер что-то запомнил (например, очки в игре или имя игрока), ему нужна <b>переменная</b>. У любой переменной есть 3 главных свойства:</p>
-            <ul>
-                <li>🏷️ <b>ИМЯ:</b> Наклейка на коробке, чтобы мы могли её найти (например, <i>score</i>).</li>
-                <li>🍎 <b>ЗНАЧЕНИЕ:</b> То, что лежит внутри коробки (например, число <i>100</i>).</li>
-                <li>📏 <b>РАЗМЕР:</b> Сколько места коробка занимает на складе (в памяти компьютера).</li>
-            </ul>
-            
-            <div class="box-creator">
-                <div>
-                    <h3>Создай свою переменную:</h3>
-                    <div class="input-group">
-                        <label>Имя (на английском):</label><br>
-                        <input type="text" id="varName" placeholder="Например: player_name" oninput="updateBox()">
-                    </div>
-                    <div class="input-group">
-                        <label>Значение (текст или число):</label><br>
-                        <input type="text" id="varValue" placeholder="Например: Супер Марио" oninput="updateBox()">
-                    </div>
+            <div class="instruction">⚡ ЗАДАЧА: Создай умный блок с данными!</div>
+            <div class="factory-zone">
+                <div class="control-panel">
+                    <input type="text" id="vName" placeholder="Наклейка (Имя: speed)">
+                    <input type="text" id="vVal" placeholder="Груз (Значение: 100)">
+                    <button class="btn-pack" onclick="dropBox()">⬇️ Сбросить коробку!</button>
                 </div>
-                <div class="box-visual" id="boxVisual">
-                    <div class="box-label" id="boxLabel">имя_переменной</div>
-                    <div class="box-value" id="boxValue">❓</div>
+                <div class="conveyor">
+                    <div class="box-anim" id="theBox">
+                        <div class="lbl" id="bLbl">имя</div>
+                        <div class="val" id="bVal">❓</div>
+                    </div>
                 </div>
             </div>
-            <p style="text-align: center; margin-top: 20px;">Попробуй изменить имя и значение, и посмотри, как меняется коробка!</p>
+            <p style="color: #888; margin-top: 15px;">Переменная — это просто коробка с наклейкой (Имя), внутри которой лежит значение[cite: 5].</p>
         </div>
 
-        <!-- УРОВЕНЬ 2: Типы данных -->
+        <!-- УРОВЕНЬ 2 -->
         <div id="tab2" class="level-content">
-            <h2>Сортировка: Типы данных 🗂️</h2>
-            <p>Мы не можем хранить суп в бумажном пакете! Компьютер тоже требует правильные коробки для разных данных.</p>
-            <p>Распредели значения по правильным коробкам (типам данных):</p>
-            
-            <div class="sorter-container">
-                <div class="draggables" id="items">
-                    <div class="item" draggable="true" id="i1" data-type="int">100</div>
-                    <div class="item" draggable="true" id="i2" data-type="str">"Привет"</div>
-                    <div class="item" draggable="true" id="i3" data-type="float">3.14</div>
-                    <div class="item" draggable="true" id="i4" data-type="bool">True</div>
-                    <div class="item" draggable="true" id="i5" data-type="int">-5</div>
-                    <div class="item" draggable="true" id="i6" data-type="str">"Кот"</div>
+            <div class="instruction">⚡ ЗАДАЧА: Распредели данные по правильным корзинам!</div>
+            <div class="sort-game">
+                <div class="spawn-zone" id="spawnZone">
+                    <div class="drag-item" draggable="true" id="i1" data-type="int">100</div>
+                    <div class="drag-item" draggable="true" id="i2" data-type="str">"Привет"</div>
+                    <div class="drag-item" draggable="true" id="i3" data-type="float">3.14</div>
+                    <div class="drag-item" draggable="true" id="i4" data-type="bool">True</div>
+                    <div class="drag-item" draggable="true" id="i5" data-type="int">-5</div>
+                    <div class="drag-item" draggable="true" id="i6" data-type="str">"Кот"</div>
                 </div>
-                
                 <div class="buckets">
-                    <div class="bucket" data-accept="str">
-                        <h3>str (Строка)</h3>
-                        <span style="font-size: 12px; color: #8fa1c4;">Слова и текст в кавычках</span>
-                    </div>
-                    <div class="bucket" data-accept="int">
-                        <h3>int (Целое число)</h3>
-                        <span style="font-size: 12px; color: #8fa1c4;">Числа без точки</span>
-                    </div>
-                    <div class="bucket" data-accept="float">
-                        <h3>float (Дробное)</h3>
-                        <span style="font-size: 12px; color: #8fa1c4;">Числа с точкой</span>
-                    </div>
-                    <div class="bucket" data-accept="bool">
-                        <h3>bool (Логика)</h3>
-                        <span style="font-size: 12px; color: #8fa1c4;">True (Правда) / False (Ложь)</span>
-                    </div>
+                    <div class="bucket" data-accept="str"><h3>str (Текст)</h3></div>
+                    <div class="bucket" data-accept="int"><h3>int (Целые)</h3></div>
+                    <div class="bucket" data-accept="float"><h3>float (Дроби)</h3></div>
+                    <div class="bucket" data-accept="bool"><h3>bool (Правда/Ложь)</h3></div>
                 </div>
             </div>
-            <button class="btn" onclick="checkSorting()">Проверить сортировку</button>
-            <div id="res2" class="result"></div>
         </div>
 
-        <!-- УРОВЕНЬ 3: Размер / Память -->
+        <!-- УРОВЕНЬ 3 -->
         <div id="tab3" class="level-content">
-            <h2>Третье свойство: Размер и Память 📏</h2>
-            <p>У компьютера ограниченный склад (Оперативная память / ОЗУ). Каждая переменная занимает место.</p>
+            <div class="instruction">⚡ ЗАДАЧА: Брось гирю 999999 в обе коробки!</div>
+            <p style="color: #aaa; margin-bottom: 30px;">Проверь, как работает память в Python по сравнению с другими языками[cite: 5].</p>
             
-            <div class="memory-compare">
-                <div class="lang-card">
-                    <h3 style="color: #ff9800;">Другие языки (C++, Java)</h3>
-                    <p style="font-size: 14px;">Программист <b>сам</b> выбирает размер жесткой коробки. Если положить слишком большое число, коробка порвется (Переполнение)!</p>
-                    <div class="memory-box" id="cppBox" style="width: 100px; background: #607d8b;">1 Байт</div>
-                    <button class="btn" style="background: #ff9800;" onclick="breakBox()">Положить число 999 999</button>
+            <div class="crash-zone">
+                <div class="test-box c-box" id="cBox">
+                    <div class="drop-target-mem" data-lang="c"></div>
+                    C++ (Жесткая)
                 </div>
                 
-                <div class="lang-card">
-                    <h3 style="color: #4CAF50;">Магия Python 🐍</h3>
-                    <p style="font-size: 14px;">Python — умный робот! У него <b>эластичные коробки</b>. Он сам растягивает или сжимает коробку в памяти под размер данных.</p>
-                    <div class="memory-box" id="pyBox" style="width: 100px;">Маленькое число</div>
-                    <button class="btn" style="background: #4CAF50;" onclick="stretchBox()">Положить огромное число</button>
+                <div class="heavy-weight" draggable="true" id="heavyWeight">99999</div>
+                
+                <div class="test-box py-box" id="pyBox">
+                    <div class="drop-target-mem" data-lang="py"></div>
+                    Python (Резина)
                 </div>
             </div>
+            <div id="crashMsg" style="font-size: 24px; font-weight: bold; margin-top: 30px; height: 30px; color: #f9a826;"></div>
         </div>
 
-        <!-- УРОВЕНЬ 4: Практика (Сборка кода) -->
+        <!-- УРОВЕНЬ 4 -->
         <div id="tab4" class="level-content">
-            <h2>Напиши код! 👨‍💻</h2>
-            <p>Собери код на Python. Нам нужно создать две переменные (имя и возраст), а затем вывести их на экран.</p>
-            
+            <div class="instruction">⚡ ЗАДАЧА: Собери скрипт запуска!</div>
             <div class="code-workspace">
-                <div class="palette" id="codePalette">
+                <div class="palette-code" id="codePal">
                     <div class="code-block" draggable="true" id="c1">print(name, age)</div>
                     <div class="code-block" draggable="true" id="c2">age = 10</div>
                     <div class="code-block" draggable="true" id="c3">name = "Барсик"</div>
                 </div>
-                
-                <div class="editor">
-                    <div class="drop-zone" data-expected="c3">1. Переменная с именем</div>
-                    <div class="drop-zone" data-expected="c2">2. Переменная с возрастом</div>
-                    <div class="drop-zone" data-expected="c1">3. Команда вывода (print)</div>
+                <div class="editor-code">
+                    <div class="drop-zone-code" data-expected="c3">Сначала Имя</div>
+                    <div class="drop-zone-code" data-expected="c2">Затем Возраст</div>
+                    <div class="drop-zone-code" data-expected="c1">Потом Вывод на экран</div>
                 </div>
             </div>
-            
-            <button class="btn" onclick="checkCode()">Запустить код ▶️</button>
-            <div id="res4" class="result"></div>
+            <button class="btn-check" onclick="checkCode()">ЗАПУСТИТЬ ПРОГРАММУ ▶️</button>
+            <div id="resCode" class="res-msg"></div>
         </div>
     </div>
 
     <script>
-        // Навигация по вкладкам
-        function openTab(num) {
-            document.querySelectorAll('.level-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab' + num).classList.add('active');
-            document.querySelectorAll('.tab-btn')[num - 1].classList.add('active');
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
         }
 
-        // Уровень 1: Обновление коробки
-        function updateBox() {
-            let name = document.getElementById('varName').value;
-            let val = document.getElementById('varValue').value;
-            document.getElementById('boxLabel').innerText = name ? name : "имя_переменной";
-            document.getElementById('boxValue').innerText = val ? val : "❓";
+        // УРОВЕНЬ 1
+        function dropBox() {
+            let n = document.getElementById('vName').value || "speed";
+            let v = document.getElementById('vVal').value || "100";
+            let box = document.getElementById('theBox');
+            
+            // Поднимаем вверх
+            box.style.top = "-150px";
+            
+            setTimeout(() => {
+                document.getElementById('bLbl').innerText = n;
+                document.getElementById('bVal').innerText = v;
+                box.style.top = "40px"; // Падает вниз
+            }, 300);
         }
 
-        // Общая логика Drag and Drop
+        // Общий Drag & Drop
         let draggedItem = null;
-        document.addEventListener('dragstart', e => {
-            if (e.target.draggable) draggedItem = e.target;
-        });
+        document.addEventListener('dragstart', e => { if(e.target.draggable) draggedItem = e.target; });
 
-        // Настройка Drag and Drop для Уровня 2 (Сортировка)
-        document.querySelectorAll('.bucket').forEach(bucket => {
-            bucket.addEventListener('dragover', e => { e.preventDefault(); bucket.classList.add('dragover'); });
-            bucket.addEventListener('dragleave', () => bucket.classList.remove('dragover'));
-            bucket.addEventListener('drop', e => {
+        // УРОВЕНЬ 2
+        document.querySelectorAll('.bucket').forEach(b => {
+            b.addEventListener('dragover', e => { e.preventDefault(); b.classList.add('dragover'); });
+            b.addEventListener('dragleave', () => b.classList.remove('dragover'));
+            b.addEventListener('drop', e => {
                 e.preventDefault();
-                bucket.classList.remove('dragover');
-                if (draggedItem && draggedItem.classList.contains('item')) {
-                    bucket.appendChild(draggedItem);
+                b.classList.remove('dragover');
+                if(draggedItem && draggedItem.classList.contains('drag-item')) {
+                    if(draggedItem.getAttribute('data-type') === b.getAttribute('data-accept')) {
+                        b.appendChild(draggedItem);
+                    } else {
+                        // Ошибка: тряска
+                        draggedItem.style.transform = "translateX(10px)";
+                        setTimeout(() => draggedItem.style.transform = "translateX(-10px)", 50);
+                        setTimeout(() => draggedItem.style.transform = "translateX(0)", 100);
+                    }
                 }
             });
         });
-        // Возврат элементов в палитру Уровня 2
-        const itemsPalette = document.getElementById('items');
-        itemsPalette.addEventListener('dragover', e => e.preventDefault());
-        itemsPalette.addEventListener('drop', e => {
-            e.preventDefault();
-            if (draggedItem && draggedItem.classList.contains('item')) itemsPalette.appendChild(draggedItem);
-        });
 
-        function checkSorting() {
-            let allCorrect = true;
-            let totalMoved = 0;
-            document.querySelectorAll('.bucket').forEach(bucket => {
-                const accept = bucket.getAttribute('data-accept');
-                bucket.querySelectorAll('.item').forEach(item => {
-                    totalMoved++;
-                    if (item.getAttribute('data-type') !== accept) allCorrect = false;
-                });
-            });
-
-            const res = document.getElementById('res2');
-            res.style.display = 'block';
-            if (totalMoved < 6) {
-                res.className = 'result error'; res.innerText = '⚠️ Разложи все значения по коробкам!';
-            } else if (allCorrect) {
-                res.className = 'result success'; res.innerText = '✅ Отлично! Компьютер доволен порядком на складе!';
-            } else {
-                res.className = 'result error'; res.innerText = '❌ Ошибка! Проверь, кавычки — это всегда str, а точка — float.';
-            }
-        }
-
-        // Уровень 3: Анимации памяти
-        function breakBox() {
-            const box = document.getElementById('cppBox');
-            box.innerText = "💥 ОШИБКА!";
-            box.classList.add('broken');
-            setTimeout(() => { box.innerText = "1 Байт"; box.classList.remove('broken'); }, 2000);
-        }
-
-        function stretchBox() {
-            const box = document.getElementById('pyBox');
-            box.style.width = "90%";
-            box.innerText = "99999999999 (Место расширено!)";
-            setTimeout(() => { box.style.width = "100px"; box.innerText = "Маленькое число"; }, 3000);
-        }
-
-        // Уровень 4: Drag and Drop для кода
-        document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.addEventListener('dragover', e => e.preventDefault());
-            zone.addEventListener('drop', e => {
+        // УРОВЕНЬ 3
+        document.querySelectorAll('.drop-target-mem').forEach(t => {
+            t.addEventListener('dragover', e => e.preventDefault());
+            t.addEventListener('drop', e => {
                 e.preventDefault();
-                // Если в слоте уже есть блок, возвращаем его в палитру
-                if (zone.children.length > 0) document.getElementById('codePalette').appendChild(zone.children[0]);
-                if (draggedItem && draggedItem.classList.contains('code-block')) zone.appendChild(draggedItem);
+                let lang = t.getAttribute('data-lang');
+                let msg = document.getElementById('crashMsg');
+                if(draggedItem && draggedItem.id === 'heavyWeight') {
+                    if(lang === 'c') {
+                        document.getElementById('cBox').classList.add('broken');
+                        document.getElementById('cBox').innerHTML = "💥 БАБАХ!";
+                        msg.innerText = "Ошибка переполнения памяти! Жесткая коробка порвалась[cite: 5].";
+                        msg.style.color = "#e53935";
+                    } else if (lang === 'py') {
+                        document.getElementById('pyBox').classList.add('stretched');
+                        document.getElementById('pyBox').innerHTML = "📦 Эластично!";
+                        msg.innerText = "Магия Python! Коробка сама растянулась под размер числа[cite: 5].";
+                        msg.style.color = "#4CAF50";
+                    }
+                }
             });
         });
-        const codePalette = document.getElementById('codePalette');
-        codePalette.addEventListener('dragover', e => e.preventDefault());
-        codePalette.addEventListener('drop', e => {
-            e.preventDefault();
-            if (draggedItem && draggedItem.classList.contains('code-block')) codePalette.appendChild(draggedItem);
+
+        // УРОВЕНЬ 4
+        document.querySelectorAll('.drop-zone-code, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { e.preventDefault(); if(z.classList.contains('drop-zone-code')) z.classList.add('dragover'); });
+            z.addEventListener('dragleave', () => { if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover'); });
+            z.addEventListener('drop', e => {
+                e.preventDefault();
+                if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
+                
+                if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
+                    document.getElementById('codePal').appendChild(z.children[0]);
+                }
+                if(draggedItem && draggedItem.classList.contains('code-block')) {
+                    if(z.classList.contains('drop-zone-code')) z.innerHTML = '';
+                    z.appendChild(draggedItem);
+                }
+            });
         });
 
         function checkCode() {
             let correct = true, empty = false;
-            document.querySelectorAll('.drop-zone').forEach(z => {
-                if (!z.firstElementChild) empty = true;
-                else if (z.firstElementChild.id !== z.dataset.expected) correct = false;
+            document.querySelectorAll('.drop-zone-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.id !== z.dataset.expected) correct = false;
             });
-            const r = document.getElementById('res4');
+            let r = document.getElementById('resCode');
             r.style.display = 'block';
-            if (empty) { r.className = 'result error'; r.innerHTML = '⚠️ Поставь все блоки кода на места!'; }
-            else if (correct) { r.className = 'result success'; r.innerHTML = '✅ Программа работает! В консоли: Барсик 10'; }
-            else { r.className = 'result error'; r.innerHTML = '❌ Ошибка. Сначала задаем значения переменным (имя, затем возраст), а потом печатаем (print).'; }
+            if(empty) { r.style.background = '#e53935'; r.innerText = '⚠️ Вставь все блоки!'; }
+            else if(correct) { r.style.background = '#4CAF50'; r.innerText = '✅ Робот готов! В консоли появилось: Барсик 10'; }
+            else { r.style.background = '#333'; r.innerText = '❌ Ошибка! Сначала задаем переменные, потом печатаем.'; }
         }
     </script>
 </body>
