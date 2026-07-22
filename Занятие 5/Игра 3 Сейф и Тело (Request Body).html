@@ -2,167 +2,300 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Уровень 3: Тело запроса (Body) 🔐</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Экшн-Сейф (POST & Body) 🔐</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1e1e2f; color: #fff; text-align: center; padding: 20px; margin: 0; }
-        h1 { color: #e91e63; }
-        .container { display: flex; gap: 20px; justify-content: center; text-align: left; max-width: 1400px; margin: auto; align-items: flex-start; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0c10; color: #c5c6c7; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #e91e63; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(233, 30, 99, 0.5); }
         
-        .theory, .practice { background: #2a2a40; padding: 25px; border-radius: 10px; width: 50%; border: 2px solid #5c1e3a; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .theory h2, .practice h2 { color: #ffeb3b; margin-top: 0; }
+        .game-container { max-width: 1000px; margin: 0 auto; background: #1f2833; border-radius: 15px; box-shadow: 0 0 20px rgba(233, 30, 99, 0.2); border: 2px solid #c2185b; overflow: hidden; }
+        .tabs { display: flex; background: #0b0c10; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0b0c10; color: #777; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { color: #fff; background-color: #1f2833; border-bottom: 4px solid #e91e63; }
+        .tab-btn:hover:not(.active) { background-color: #1a2028; color: #ccc; }
         
-        .error-box { background: #4a1525; border: 2px dashed #ff4c4c; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .error-box h3 { color: #ff4c4c; margin-top: 0; }
-        
-        .real-world-box { background: #1a2a3a; border: 2px solid #00d2ff; padding: 15px; border-radius: 8px; }
-        .real-world-box h3 { color: #00d2ff; margin-top: 0; }
-        
-        .frontend-form { background: #fff; color: #333; padding: 15px; border-radius: 5px; text-align: center; margin-top: 15px;}
-        .frontend-form input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .frontend-form button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .frontend-form button:hover { background: #45a049; }
-        
-        .json-anim { background: #111; padding: 10px; color: #e91e63; font-family: monospace; border-radius: 5px; white-space: pre-wrap; margin-top: 10px; display: none; font-size: 13px; }
-        .browser-response { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-top: 10px; display: none; font-weight: bold; }
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
+        .level-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        .palette { display: flex; flex-direction: column; gap: 10px; min-height: 50px; background: #1a1a2e; padding: 15px; border-radius: 5px;}
-        .code-block { background: #282c34; border-left: 5px solid #e91e63; padding: 10px; cursor: grab; font-family: monospace; border-radius: 5px; user-select: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .drop-zone { background: #1a1a2e; border: 2px dashed #6c6c86; min-height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #888; transition: 0.2s; }
-        .drop-zone.dragover { background: #2a2a40; border-color: #e91e63; color: #e91e63; }
-        .drop-zone .code-block { width: 100%; margin: 0; box-sizing: border-box; }
+        .instruction { font-size: 22px; color: #e91e63; font-weight: bold; margin-bottom: 20px; }
+
+        /* УРОВЕНЬ 1: Охранник (GET vs POST) */
+        .server-gate { background: #0b0c10; border: 2px dashed #c2185b; border-radius: 10px; padding: 30px; margin-top: 20px; position: relative; overflow: hidden; }
+        .gate-scene { display: flex; align-items: center; justify-content: space-between; height: 120px; background: #111; border-radius: 8px; padding: 0 20px; position: relative; border-bottom: 5px solid #333; }
         
-        .check-btn { background: #e91e63; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; font-size: 18px; color: #fff; transition: 0.2s; }
-        .check-btn:hover { background: #c2185b; transform: scale(1.02); }
-        .result { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; text-align: center; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .courier { font-size: 60px; position: absolute; left: 20px; transition: left 0.8s ease-in-out; z-index: 2; }
+        .guard { font-size: 70px; z-index: 2; transition: 0.3s; }
+        .server-door { font-size: 80px; z-index: 1; opacity: 0.5; }
+        
+        .controls-row { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .btn-gate { font-size: 18px; font-weight: bold; padding: 15px 25px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 45%; text-transform: uppercase; }
+        .btn-get { background: #3498db; color: #fff; } .btn-get:hover { background: #2980b9; box-shadow: 0 0 15px rgba(52, 152, 219, 0.5); }
+        .btn-post { background: #e91e63; color: #fff; } .btn-post:hover { background: #c2185b; box-shadow: 0 0 15px rgba(233, 30, 99, 0.5); }
+        
+        .gate-msg { margin-top: 20px; font-size: 20px; font-weight: bold; min-height: 30px; font-family: monospace; }
+
+        /* УРОВЕНЬ 2: Симулятор Фронтенда */
+        .frontend-zone { display: flex; justify-content: space-between; gap: 20px; background: #0b0c10; padding: 20px; border-radius: 10px; border: 2px solid #c2185b; margin-top: 20px; }
+        .form-side { flex: 1; background: #1f2833; padding: 20px; border-radius: 8px; }
+        .form-side input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 2px solid #e91e63; background: #111; color: #fff; font-size: 16px; outline: none; }
+        
+        .json-side { flex: 1; background: #111; padding: 20px; border-radius: 8px; font-family: monospace; color: #98c379; text-align: left; font-size: 16px; position: relative; display: flex; flex-direction: column; justify-content: center; border: 2px dashed #444;}
+        .json-loader { display: none; color: #e91e63; font-weight: bold; font-size: 18px; text-align: center; }
+        
+        .btn-send { background: #2ecc71; color: #000; font-weight: bold; font-size: 18px; padding: 15px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 15px; }
+        .btn-send:hover { background: #27ae60; box-shadow: 0 0 15px rgba(46, 204, 113, 0.5); }
+
+        /* УРОВЕНЬ 3: Сборка Кода */
+        .code-workspace { display: flex; gap: 20px; text-align: left; margin-top: 20px; }
+        .palette-code, .editor-code { background: #0b0c10; padding: 20px; border-radius: 10px; width: 50%; border: 1px solid #c2185b; }
+        .palette-code h3, .editor-code h3 { color: #e91e63; margin-top: 0; text-align: center; }
+        .code-block { background: #1f2833; border-left: 5px solid #e91e63; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .code-block:active { cursor: grabbing; }
+        .c-kw { color: #c678dd; } .c-type { color: #e5c07b; } .c-str { color: #98c379; }
+        
+        .drop-zone-code { background: #111; border: 2px dashed #c2185b; min-height: 45px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 14px; transition: 0.2s; text-align: center; padding: 0 5px;}
+        .drop-zone-code.dragover { border-color: #e91e63; background: rgba(233,30,99,0.1); }
+        .drop-zone-code .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        
+        .btn-check { background: #e91e63; color: #fff; border: none; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; }
+        .btn-check:hover { background: #c2185b; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes nod { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
-    <h1>Уровень 3: Тело запроса (Body) и Сейф 🔐</h1>
-    <div class="container">
-        <!-- ТЕОРИЯ И ОБЪЯСНЕНИЕ -->
-        <div class="theory">
-            <h2>Почему обычная ссылка ломается?</h2>
-            
-            <div class="error-box">
-                <h3>❌ Ошибка 405: Method Not Allowed</h3>
-                <p>Если ты введешь <code>http://127.0.0.1:8000/new_cat</code> в адресную строку браузера и нажмешь Enter, появится ошибка.</p>
-                <p><b>Почему?</b> Адресная строка браузера умеет делать ТОЛЬКО <b>GET-запросы</b>. Это как отправить курьера с пустыми руками и сказать: "Забери данные". Но сервер ждет <b>POST-запрос</b> — курьера, который ПРИНЕСЕТ посылку (Сейф с данными)! Охранник на сервере видит пустые руки и говорит: "Тебе сюда нельзя (Not Allowed)!"</p>
-            </div>
 
-            <div class="real-world-box">
-                <h3>✅ Как же тогда отправить POST-запрос?</h3>
-                <p>1. Разработчики используют <b>Swagger</b> (http://127.0.0.1:8000/docs), потому что он умеет собирать "Сейфы".</p>
-                <p>2. <b>В реальной жизни</b> обычные люди не используют Swagger. Разработчики создают для них красивые сайты с кнопочками! Кнопка на сайте с помощью невидимого кода (JavaScript) собирает JSON-сейф и отправляет его на сервер.</p>
-                
-                <div class="frontend-form">
-                    <h4>Симулятор реального сайта (Фронтенд)</h4>
-                    <input type="text" id="catName" placeholder="Имя кота (напр. Барсик)">
-                    <input type="number" id="catAge" placeholder="Возраст (напр. 4)">
-                    <button onclick="simulateFrontend()">Отправить форму на сервер</button>
-                    
-                    <div id="jsonProcess" class="json-anim"></div>
-                    <div id="serverResponse" class="browser-response"></div>
+    <h1>🔐 Экшн-Сейф (Тело Запроса) 🔐</h1>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(1)">1. Охранник (GET vs POST)</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Фабрика JSON</button>
+            <button class="tab-btn" onclick="openTab(3)">3. Сборка Бэкенда</button>
+        </div>
+
+        <!-- УРОВЕНЬ 1: Охранник (GET vs POST) -->
+        <div id="tab1" class="level-content active">
+            <div class="instruction">⚡ ЗАДАЧА: Пройди фейсконтроль на сервере!</div>
+            <p style="color: #aaa; margin-bottom: 20px;">Обычная адресная строка браузера — это GET-запрос (курьер с пустыми руками). А сервер ждет POST-запрос с Сейфом (Body) внутри!</p>
+            
+            <div class="server-gate">
+                <div class="gate-scene">
+                    <div class="courier" id="courier">🚶‍♂️</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="guard" id="guard">👮‍♂️</div>
+                        <div class="server-door">🚪</div>
+                    </div>
                 </div>
+                
+                <div class="controls-row">
+                    <button class="btn-gate btn-get" onclick="sendRequest('GET')">Отправить GET<br><span style="font-size: 12px; font-weight: normal;">(Обычная ссылка)</span></button>
+                    <button class="btn-gate btn-post" onclick="sendRequest('POST')">Отправить POST<br><span style="font-size: 12px; font-weight: normal;">(С невидимым сейфом)</span></button>
+                </div>
+                
+                <div class="gate-msg" id="gateMsg">Ожидание курьера...</div>
             </div>
         </div>
 
-        <!-- ПРАКТИКА -->
-        <div class="practice">
-            <h2>Собери защищенный сервер:</h2>
-            <p style="color: #bbb; margin-bottom: 20px;">Теперь, когда ты знаешь, как фронтенд отправляет данные, напиши сервер (Бэкенд), который их примет!</p>
+        <!-- УРОВЕНЬ 2: Фабрика JSON -->
+        <div id="tab2" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Создай невидимый сейф (JSON)!</div>
+            <p style="color: #aaa; margin-bottom: 15px;">В реальной жизни люди не пишут код. Они заполняют красивые формочки на сайтах. А сайт (фронтенд) сам упаковывает их ответы в JSON-сейф и отправляет POST-запросом.</p>
             
-            <div class="palette" id="palette">
-                <div class="code-block" draggable="true" id="b6">&nbsp;&nbsp;&nbsp;&nbsp;return f"Кот {cat.name} создан!"</div>
-                <div class="code-block" draggable="true" id="b4">@app.post("/new_cat")</div>
-                <div class="code-block" draggable="true" id="b3">class Cat(BaseModel):<br>&nbsp;&nbsp;&nbsp;&nbsp;name: str<br>&nbsp;&nbsp;&nbsp;&nbsp;age: int</div>
-                <div class="code-block" draggable="true" id="b5">def create_cat(cat: Cat):<br>&nbsp;&nbsp;&nbsp;&nbsp;print(cat) # Камера наблюдения</div>
-                <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
-                <div class="code-block" draggable="true" id="b1">from fastapi import FastAPI<br>from pydantic import BaseModel</div>
+            <div class="frontend-zone">
+                <div class="form-side">
+                    <h3 style="color: #e91e63; margin-top: 0;">Красивый сайт (Фронтенд)</h3>
+                    <input type="text" id="catName" placeholder="Имя кота (напр. Барсик)">
+                    <input type="number" id="catAge" placeholder="Возраст (напр. 4)">
+                    <button class="btn-send" onclick="packAndSend()">Упаковать и Отправить 🚀</button>
+                </div>
+                
+                <div class="json-side" id="jsonSide">
+                    <div style="color: #555; text-align: center;" id="jsonPlaceholder">Здесь появится запакованный JSON...</div>
+                    <div class="json-loader" id="jsonLoader">⏳ Упаковка в сейф...</div>
+                    <div id="jsonResult" style="display: none;"></div>
+                </div>
             </div>
+            <p id="serverRes2" style="font-size: 20px; font-weight: bold; color: #2ecc71; margin-top: 20px; display: none;"></p>
+        </div>
+
+        <!-- УРОВЕНЬ 3: Сборка Бэкенда -->
+        <div id="tab3" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Собери Сервер, который вскроет Сейф!</div>
             
-            <h3 style="margin-top: 20px;">Твой код (Бэкенд):</h3>
-            <div class="drop-zone" data-expected="b1">1. Импорты (нужен еще Pydantic!)</div>
-            <div class="drop-zone" data-expected="b2">2. Создание приложения</div>
-            <div class="drop-zone" data-expected="b3">3. Чертеж кота (Класс Pydantic)</div>
-            <div class="drop-zone" data-expected="b4">4. Метод POST и маршрут</div>
-            <div class="drop-zone" data-expected="b5">5. Функция, принимающая класс</div>
-            <div class="drop-zone" data-expected="b6">6. Ответ клиенту</div>
-            
-            <button class="check-btn" onclick="check()">Запустить сервер ▶️</button>
-            <div id="res" class="result"></div>
+            <div class="code-workspace">
+                <div class="palette-code" id="codePal">
+                    <h3>Детали кода</h3>
+                    <div class="code-block" draggable="true" id="b6">&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-str">f"Кот {cat.name} создан!"</span></div>
+                    <div class="code-block" draggable="true" id="b4"><span class="c-kw">@app.post</span>(<span class="c-str">"/new_cat"</span>)</div>
+                    <div class="code-block" draggable="true" id="b3"><span class="c-kw">class</span> Cat(BaseModel):<br>&nbsp;&nbsp;&nbsp;&nbsp;name: <span class="c-type">str</span><br>&nbsp;&nbsp;&nbsp;&nbsp;age: <span class="c-type">int</span></div>
+                    <div class="code-block" draggable="true" id="b5"><span class="c-kw">def</span> <span class="c-func">create_cat</span>(cat: Cat):<br>&nbsp;&nbsp;&nbsp;&nbsp;print(cat)</div>
+                    <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
+                    <div class="code-block" draggable="true" id="b1"><span class="c-kw">from</span> fastapi <span class="c-kw">import</span> FastAPI<br><span class="c-kw">from</span> pydantic <span class="c-kw">import</span> BaseModel</div>
+                </div>
+                
+                <div class="editor-code">
+                    <h3>Редактор Бэкенда</h3>
+                    <div class="drop-zone-code" data-expected="b1" data-hint="1. Импорты (FastAPI и Pydantic)">1. Импорты (FastAPI и Pydantic)[cite: 12]</div>
+                    <div class="drop-zone-code" data-expected="b2" data-hint="2. Создание приложения">2. Создание приложения[cite: 12]</div>
+                    <div class="drop-zone-code" style="height: 80px;" data-expected="b3" data-hint="3. Чертеж сейфа (Класс Pydantic)">3. Чертеж сейфа (Класс Pydantic)[cite: 12]</div>
+                    <div class="drop-zone-code" data-expected="b4" data-hint="4. Декоратор POST (Ждем посылку!)">4. Декоратор POST (Ждем посылку!)[cite: 12]</div>
+                    <div class="drop-zone-code" style="height: 60px;" data-expected="b5" data-hint="5. Функция (Принимает класс Cat)">5. Функция (Принимает класс Cat)[cite: 12]</div>
+                    <div class="drop-zone-code" data-expected="b6" data-hint="6. Ответ клиенту">6. Ответ клиенту[cite: 12]</div>
+                </div>
+            </div>
+            <button class="btn-check" onclick="checkBackendCode()">ЗАПУСТИТЬ ЗАЩИЩЕННЫЙ СЕРВЕР ▶️</button>
+            <div id="resCode" class="res-msg"></div>
         </div>
     </div>
 
     <script>
-        // --- Логика Симулятора Фронтенда (Формы) ---
-        function simulateFrontend() {
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
+        }
+
+        // --- УРОВЕНЬ 1: Охранник ---
+        let isMoving = false;
+        function sendRequest(type) {
+            if(isMoving) return;
+            isMoving = true;
+            
+            const courier = document.getElementById('courier');
+            const guard = document.getElementById('guard');
+            const msg = document.getElementById('gateMsg');
+            
+            // Настройка курьера
+            if(type === 'GET') {
+                courier.innerText = '🚶‍♂️'; // Пустые руки
+                msg.innerText = "Курьер идет с пустыми руками (GET)...";
+                msg.style.color = "#3498db";
+            } else {
+                courier.innerText = '🚶‍♂️📦'; // С сейфом
+                msg.innerText = "Курьер несет защищенный Сейф (POST)...";
+                msg.style.color = "#e91e63";
+            }
+            
+            // Движение к охраннику
+            courier.style.left = "calc(100% - 180px)";
+            
+            setTimeout(() => {
+                if(type === 'GET') {
+                    // Отказ
+                    guard.innerText = '👮‍♂️🛑';
+                    guard.style.animation = 'shake 0.4s';
+                    msg.innerHTML = "❌ ОШИБКА 405 (Method Not Allowed)!<br>Охранник: «Где сейф с данными кота? Без сейфа не пущу!»";
+                    msg.style.color = "#e74c3c";
+                    
+                    setTimeout(() => {
+                        guard.style.animation = '';
+                        guard.innerText = '👮‍♂️';
+                        courier.style.left = "20px";
+                        isMoving = false;
+                    }, 2000);
+                    
+                } else {
+                    // Успех
+                    guard.innerText = '👮‍♂️✅';
+                    guard.style.animation = 'nod 0.4s';
+                    msg.innerHTML = "✅ 200 OK!<br>Охранник: «Сейф получен! Проходи!»";
+                    msg.style.color = "#2ecc71";
+                    
+                    setTimeout(() => {
+                        courier.style.opacity = "0"; // Зашел внутрь
+                        setTimeout(() => {
+                            guard.style.animation = '';
+                            guard.innerText = '👮‍♂️';
+                            courier.style.transition = "0s";
+                            courier.style.left = "20px";
+                            setTimeout(() => {
+                                courier.style.opacity = "1";
+                                courier.style.transition = "left 0.8s ease-in-out, opacity 0.3s";
+                                isMoving = false;
+                            }, 50);
+                        }, 1000);
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        // --- УРОВЕНЬ 2: Фабрика JSON ---
+        function packAndSend() {
             const name = document.getElementById('catName').value;
             const age = document.getElementById('catAge').value;
-            const jsonBox = document.getElementById('jsonProcess');
-            const responseBox = document.getElementById('serverResponse');
-
+            const placeholder = document.getElementById('jsonPlaceholder');
+            const loader = document.getElementById('jsonLoader');
+            const result = document.getElementById('jsonResult');
+            const serverRes = document.getElementById('serverRes2');
+            
             if(!name || !age) {
-                alert("Пожалуйста, заполни имя и возраст кота!");
+                alert("Пожалуйста, заполни имя и возраст!");
                 return;
             }
 
-            // Показываем магию под капотом
-            jsonBox.style.display = 'block';
-            responseBox.style.display = 'none';
-            jsonBox.innerHTML = `⏳ Сайт (JavaScript) упаковывает данные в JSON-сейф...\n\n{\n  "name": "${name}",\n  "age": ${age}\n}\n\n🚀 Отправка POST-запроса по адресу /new_cat...`;
+            placeholder.style.display = 'none';
+            result.style.display = 'none';
+            serverRes.style.display = 'none';
+            loader.style.display = 'block';
 
-            // Имитация задержки сети
+            // Имитация процесса упаковки в JSON
             setTimeout(() => {
-                responseBox.style.display = 'block';
-                responseBox.innerHTML = `✅ Сервер FastAPI ответил: "Кот ${name} создан!"<br><span style="font-size: 12px; font-weight: normal;">(Именно так работают регистрации в играх и соцсетях!)</span>`;
+                loader.style.display = 'none';
+                result.style.display = 'block';
+                result.innerHTML = `{\n  <span style="color:#e06c75;">"name"</span>: <span style="color:#98c379;">"${name}"</span>,\n  <span style="color:#e06c75;">"age"</span>: <span style="color:#d19a66;">${age}</span>\n}`;
+                
+                // Имитация ответа от сервера
+                setTimeout(() => {
+                    serverRes.style.display = 'block';
+                    serverRes.innerHTML = `✅ Бэкенд ответил: "Кот ${name} успешно создан!"`;
+                }, 1000);
             }, 1500);
         }
 
-        // --- Логика Drag and Drop ---
-        let dragged;
-        document.addEventListener('dragstart', e => {
-            if(e.target.classList.contains('code-block')) dragged = e.target;
+        // --- УРОВЕНЬ 3: Сборка Кода ---
+        let draggedBlock = null;
+        document.querySelectorAll('.code-block').forEach(b => {
+            b.addEventListener('dragstart', function() { draggedBlock = this; });
         });
-        
-        document.querySelectorAll('.drop-zone, .palette').forEach(zone => {
-            zone.addEventListener('dragover', e => {
+
+        document.querySelectorAll('.drop-zone-code, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { e.preventDefault(); if(z.classList.contains('drop-zone-code')) z.classList.add('dragover'); });
+            z.addEventListener('dragleave', () => { if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover'); });
+            z.addEventListener('drop', e => {
                 e.preventDefault();
-                if(zone.classList.contains('drop-zone')) zone.classList.add('dragover');
-            });
-            zone.addEventListener('dragleave', e => {
-                if(zone.classList.contains('drop-zone')) zone.classList.remove('dragover');
-            });
-            zone.addEventListener('drop', e => {
-                e.preventDefault();
-                if(zone.classList.contains('drop-zone')) zone.classList.remove('dragover');
+                if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
                 
-                if (zone.classList.contains('drop-zone') && zone.children.length > 0) {
-                    document.getElementById('palette').appendChild(zone.children[0]);
+                if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
+                    document.getElementById('codePal').appendChild(z.children[0]);
                 }
-                if (dragged) zone.appendChild(dragged);
+                if(draggedBlock && draggedBlock.classList.contains('code-block')) {
+                    if(z.classList.contains('drop-zone-code')) z.innerHTML = '';
+                    z.appendChild(draggedBlock);
+                }
             });
         });
 
-        // --- Логика Проверки кода ---
-        function check() {
+        function checkBackendCode() {
             let correct = true, empty = false;
-            document.querySelectorAll('.drop-zone').forEach(z => {
-                if (!z.firstElementChild) empty = true;
-                else if (z.firstElementChild.id !== z.dataset.expected) correct = false;
+            document.querySelectorAll('.drop-zone-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.id !== z.dataset.expected) correct = false;
             });
-            const r = document.getElementById('res');
+            
+            let r = document.getElementById('resCode');
             r.style.display = 'block';
-            if (empty) { 
-                r.className = 'result error'; 
-                r.innerHTML = '⚠️ Расставь все блоки по местам!'; 
-            } else if (correct) { 
-                r.className = 'result success'; 
-                r.innerHTML = '✅ ГЕНИАЛЬНО! Твой бэкенд готов принимать JSON-сейфы от любых сайтов!'; 
+            
+            if(empty) { 
+                r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки на места!'; 
+            } else if(correct) { 
+                r.style.background = '#2ecc71'; r.style.color='#000'; r.innerText = '✅ ГЕНИАЛЬНО! Твой бэкенд готов принимать JSON-сейфы и проверять их через Pydantic!'; 
             } else { 
-                r.className = 'result error'; 
-                r.innerHTML = '❌ Ошибка. Правило: Импорты -> App -> Класс Pydantic -> Декоратор POST -> Функция -> Return.'; 
+                r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка в структуре! Импорты -> app -> Класс -> POST -> Функция -> Return.'; 
             }
         }
     </script>
