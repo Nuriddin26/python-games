@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Экшн-Старт Python 🚀</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0c10; color: #c5c6c7; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #66fcf1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5); }
+        
+        .game-container { max-width: 1000px; margin: 0 auto; background: #1f2833; border-radius: 15px; box-shadow: 0 0 20px rgba(102, 252, 241, 0.2); border: 2px solid #45a29e; overflow: hidden; }
+        .tabs { display: flex; background: #0b0c10; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0b0c10; color: #777; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
+        .tab-btn.active { color: #fff; background-color: #1f2833; border-bottom: 4px solid #66fcf1; }
+        .tab-btn:hover:not(.active) { background-color: #1a2028; color: #ccc; }
+        
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
+        .level-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .instruction { font-size: 20px; color: #45a29e; font-weight: bold; margin-bottom: 15px; }
+
+        /* ОБЩЕЕ: Терминал */
+        .terminal { background: #111; border-radius: 8px; border: 2px solid #333; text-align: left; font-family: monospace; font-size: 16px; padding: 15px; min-height: 200px; box-shadow: inset 0 0 10px #000; display: flex; flex-direction: column; justify-content: flex-end; }
+        .term-output { color: #ccc; margin-bottom: 10px; white-space: pre-wrap; }
+        .term-line { display: flex; align-items: center; color: #fff; }
+        .term-prompt { color: #2ecc71; font-weight: bold; margin-right: 10px; }
+        .term-input-fake { color: #f1c40f; border-right: 10px solid #f1c40f; animation: blink 1s step-end infinite; padding-right: 5px; }
+        @keyframes blink { 50% { border-color: transparent; } }
+
+        .cmd-palette { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; background: #0b0c10; padding: 15px; border-radius: 8px; border: 1px solid #45a29e; }
+        .cmd-btn { background: #1f2833; color: #66fcf1; border: 2px solid #45a29e; padding: 10px 15px; border-radius: 5px; font-family: monospace; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .cmd-btn:hover:not(:disabled) { background: #45a29e; color: #000; transform: scale(1.05); }
+        .cmd-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; color: #777; }
+
+        /* УРОВЕНЬ 1: Установка */
+        .browser-window { display: none; background: #fff; border-radius: 8px; border: 2px solid #ccc; margin-top: 20px; overflow: hidden; color: #333; animation: fadeIn 0.4s; }
+        .browser-header { background: #e0e0e0; padding: 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #ccc; font-weight: bold;}
+        .browser-body { padding: 30px; text-align: center; }
+        .site-btn { background: #3498db; color: #fff; border: none; padding: 10px 20px; font-size: 18px; border-radius: 5px; cursor: pointer; transition: 0.2s; margin: 5px;}
+        .site-btn:hover { background: #2980b9; }
+        
+        .installer-modal { display: none; background: #ecf0f1; border: 2px solid #bdc3c7; border-radius: 8px; padding: 20px; width: 300px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .inst-btn-yes { background: #2ecc71; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .inst-btn-no { background: #e74c3c; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 5px; }
+
+        /* УРОВЕНЬ 2: Путь (cd) */
+        .explorer-window { background: #2c3e50; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: left; display: flex; align-items: center; justify-content: space-between; border: 2px solid #34495e;}
+        .folder-path { background: #1a252f; padding: 10px; border-radius: 5px; font-family: monospace; color: #f1c40f; font-size: 16px; flex: 1; margin-right: 15px; }
+        .btn-copy { background: #f39c12; color: #000; border: none; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-copy:hover { background: #f1c40f; transform: scale(1.05); }
+        
+        .drop-zone { background: #111; border: 2px dashed #f39c12; height: 40px; min-width: 100px; display: inline-flex; align-items: center; justify-content: center; color: #777; margin: 0 5px; border-radius: 4px; padding: 0 10px; transition: 0.2s;}
+        .drop-zone.dragover { background: rgba(243, 156, 18, 0.2); border-color: #f1c40f; }
+        .drag-block { background: #f39c12; color: #000; padding: 5px 10px; font-weight: bold; font-family: monospace; border-radius: 4px; cursor: grab; user-select: none; }
+        .drag-block:active { cursor: grabbing; }
+
+        /* УРОВЕНЬ 3: Код Запуска */
+        .code-workspace { display: flex; gap: 20px; text-align: left; margin-top: 20px; }
+        .palette-code, .editor-code { background: #0b0c10; padding: 20px; border-radius: 10px; width: 50%; border: 1px solid #0be881; }
+        .code-block { background: #1f2833; border-left: 5px solid #0be881; padding: 12px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: inline-block; }
+        
+        .dz-code { background: #111; border: 2px dashed #0be881; min-height: 40px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; transition: 0.2s; }
+        .dz-code.dragover { border-color: #0be881; background: rgba(11,232,129,0.1); }
+        .dz-code .code-block { margin: 0; width: 100%; box-sizing: border-box; text-align: center; }
+
+        .btn-check { background: #0be881; color: #000; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; text-transform: uppercase; }
+        .btn-check:hover { background: #05c46b; color: #fff; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Экшн-Старт Python 🚀</h1>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(1)">1. Установка и Модули</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Правило Пути (cd)</button>
+            <button class="tab-btn" onclick="openTab(3)">3. Запуск Сервера</button>
+        </div>
+
+        <!-- УРОВЕНЬ 1: Установка и Модули -->
+        <div id="tab1" class="level-content active">
+            <div class="instruction">⚡ ЗАДАЧА: Настрой окружение в терминале VS Code!</div>
+            <p style="color: #aaa; margin-bottom: 15px; font-size: 14px;">Кликай по командам в правильном порядке. Сначала проверь Python, установи его при необходимости, а затем добавь нужные библиотеки.</p>
+            
+            <div class="terminal" id="term1">
+                <div class="term-output" id="output1">VS Code Terminal Ready...</div>
+                <div class="term-line">
+                    <span class="term-prompt">C:\Projects></span>
+                    <span class="term-input-fake" id="fakeInput1"></span>
+                </div>
+            </div>
+            
+            <div class="cmd-palette">
+                <button class="cmd-btn" onclick="runCmd('python --version')">python --version</button>
+                <button class="cmd-btn" id="btnPipShow" onclick="runCmd('pip show fastapi')" disabled>pip show fastapi</button>
+                <button class="cmd-btn" id="btnPipInstall1" onclick="runCmd('pip install fastapi')" disabled>pip install fastapi</button>
+                <button class="cmd-btn" id="btnPipInstall2" onclick="runCmd('pip install &quot;uvicorn[standard]&quot;')" disabled>pip install "uvicorn[standard]"</button>
+            </div>
+
+            <!-- БРАУЗЕР (открывается если Python не найден) -->
+            <div class="browser-window" id="browserWindow">
+                <div class="browser-header">
+                    <span style="color:red">🔴</span><span style="color:#f1c40f">🟡</span><span style="color:#2ecc71">🟢</span> 
+                    <span style="margin-left:10px; font-family:monospace;" id="browserUrl">https://www.google.com</span>
+                </div>
+                <div class="browser-body" id="browserBody">
+                    <h3>Поиск в интернете...</h3>
+                    <button class="site-btn" onclick="navTo('python.org')">Перейти на python.org</button>
+                </div>
+            </div>
+
+            <!-- УСТАНОВЩИК -->
+            <div class="installer-modal" id="installerModal">
+                <h3 style="margin-top:0; color:#2c3e50;">Python Install Manager</h3>
+                <p id="instText">Продолжить установку?</p>
+                <button class="inst-btn-yes" id="btnYes" onclick="instClick('yes')">Yes</button>
+                <button class="inst-btn-no" id="btnNo" onclick="instClick('no')" style="display:none;">No</button>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Правило Пути -->
+        <div id="tab2" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Синхронизируй терминал с папкой файла!</div>
+            <p style="color: #aaa; margin-bottom: 15px; font-size: 14px;">Главное правило: терминал должен находиться там же, где твой файл! Скопируй путь и используй команду <b>cd</b>.</p>
+            
+            <div class="explorer-window">
+                <div>
+                    <div style="font-size:12px; color:#bdc3c7; margin-bottom:5px;">📂 Проводник (Где лежит файл server.py):</div>
+                    <div class="folder-path" id="folderPath">D:\MySites\ShopProject</div>
+                </div>
+                <button class="btn-copy" onclick="copyPath()">📋 Копировать путь</button>
+            </div>
+
+            <div class="terminal">
+                <div class="term-output">VS Code Terminal</div>
+                <div class="term-line" id="termLine2">
+                    <span class="term-prompt">C:\Users\Default></span>
+                    <!-- Зоны сброса -->
+                    <div class="drop-zone" id="dzCmd" data-expected="cd">команда</div>
+                    <div class="drop-zone" id="dzPath" data-expected="path">"путь"</div>
+                </div>
+            </div>
+
+            <div class="cmd-palette" id="pal2" style="min-height: 50px;">
+                <div class="drag-block" draggable="true" data-val="cd">cd</div>
+                <div class="drag-block" draggable="true" data-val="ls">ls</div>
+                <!-- Скопированный путь появится здесь -->
+            </div>
+            
+            <button class="cmd-btn" style="width:100%; margin-top:15px; background:#f39c12; color:#000;" onclick="runCd()">Нажать ENTER ↩️</button>
+            <div id="resCd" class="res-msg" style="color:#f1c40f;"></div>
+        </div>
+
+        <!-- УРОВЕНЬ 3: Запуск Сервера -->
+        <div id="tab3" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Собери команду запуска сервера!</div>
+            <p style="color: #aaa; margin-bottom: 15px; font-size: 14px;">Твой файл называется <b>main.py</b>. Внутри него написан код: <code>my_app = FastAPI()</code>. Собери команду для терминала!</p>
+            
+            <div class="code-workspace">
+                <div class="palette-code" id="pal3" style="display:flex; flex-wrap:wrap; justify-content:center; align-content:flex-start;">
+                    <div class="code-block" draggable="true" data-val="python -m uvicorn">python -m uvicorn</div>
+                    <div class="code-block" draggable="true" data-val="main">main</div>
+                    <div class="code-block" draggable="true" data-val=":">:</div>
+                    <div class="code-block" draggable="true" data-val="my_app">my_app</div>
+                    <div class="code-block" draggable="true" data-val="--reload">--reload</div>
+                </div>
+                
+                <div class="editor-code">
+                    <div class="dz-code" data-expected="python -m uvicorn">1. Инструмент запуска</div>
+                    <div class="dz-code" data-expected="main">2. Название файла (без .py)</div>
+                    <div class="dz-code" data-expected=":">3. Двоеточие</div>
+                    <div class="dz-code" data-expected="my_app">4. Название переменной FastAPI</div>
+                    <div class="dz-code" data-expected="--reload">5. Флаг авто-обновления</div>
+                </div>
+            </div>
+            <button class="btn-check" onclick="checkUvicorn()">ОТПРАВИТЬ КОМАНДУ ▶️</button>
+            <div id="resCode" class="res-msg"></div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
+        }
+
+        // --- УРОВЕНЬ 1: Логика Терминала и Установщика ---
+        let pyState = 0; // 0=not installed, 1=installed
+        let instClicks = 0;
+
+        function printTerm(text, color="#ccc") {
+            const out = document.getElementById('output1');
+            out.innerHTML += `<br><span style="color:${color}">${text}</span>`;
+        }
+
+        function runCmd(cmd) {
+            const fakeIn = document.getElementById('fakeInput1');
+            fakeIn.innerText = cmd;
+            
+            setTimeout(() => {
+                fakeIn.innerText = "";
+                printTerm(`C:\\Projects> ${cmd}`, "#fff");
+
+                if (cmd === 'python --version') {
+                    if (pyState === 0) {
+                        printTerm("'python' is not recognized as an internal or external command.", "#e74c3c");
+                        setTimeout(showBrowser, 1000);
+                    } else {
+                        printTerm("Python 3.14.6", "#2ecc71");
+                        document.getElementById('btnPipShow').disabled = false;
+                    }
+                } 
+                else if (cmd === 'pip show fastapi') {
+                    printTerm("WARNING: Package(s) not found: fastapi", "#f1c40f");
+                    document.getElementById('btnPipInstall1').disabled = false;
+                }
+                else if (cmd === 'pip install fastapi') {
+                    printTerm("Collecting fastapi...\nInstalling collected packages: fastapi\nSuccessfully installed fastapi-0.100.0", "#2ecc71");
+                    document.getElementById('btnPipInstall2').disabled = false;
+                }
+                else if (cmd === 'pip install "uvicorn[standard]"') {
+                    printTerm("Collecting uvicorn[standard]...\nSuccessfully installed uvicorn-0.23.0", "#2ecc71");
+                    setTimeout(() => alert("✅ Поздравляю! Окружение полностью готово к работе! Переходи ко 2-му уровню."), 500);
+                }
+            }, 500);
+        }
+
+        function showBrowser() {
+            document.getElementById('browserWindow').style.display = 'block';
+            printTerm("Открываем браузер для поиска Python...", "#f1c40f");
+        }
+
+        function navTo(page) {
+            const url = document.getElementById('browserUrl');
+            const body = document.getElementById('browserBody');
+            
+            if (page === 'python.org') {
+                url.innerText = "https://www.python.org";
+                body.innerHTML = `<h3>Официальный сайт Python</h3><button class="site-btn" style="background:#f1c40f; color:#000;" onclick="navTo('downloads')">Downloads</button>`;
+            } 
+            else if (page === 'downloads') {
+                url.innerText = "https://www.python.org/downloads";
+                body.innerHTML = `<h3>Загрузки</h3><button class="site-btn" style="background:#2ecc71;" onclick="startInstall()">Python install manager</button>`;
+            }
+        }
+
+        function startInstall() {
+            document.getElementById('browserWindow').style.display = 'none';
+            document.getElementById('installerModal').style.display = 'block';
+            instClicks = 0;
+            document.getElementById('instText').innerText = "Step 1: Accept terms?";
+        }
+
+        function instClick(choice) {
+            const text = document.getElementById('instText');
+            if (choice === 'yes') {
+                instClicks++;
+                if (instClicks === 1) text.innerText = "Step 2: Add to PATH (Very important!)?";
+                else if (instClicks === 2) text.innerText = "Step 3: Install for all users?";
+                else if (instClicks === 3) text.innerText = "Step 4: Install pip?";
+                else if (instClicks === 4) {
+                    text.innerText = "Installation Complete! Show help manual?";
+                    document.getElementById('btnNo').style.display = 'inline-block';
+                    document.getElementById('btnYes').style.display = 'none';
+                }
+            } else if (choice === 'no') {
+                document.getElementById('installerModal').style.display = 'none';
+                pyState = 1;
+                printTerm("Установка завершена. Проверь версию еще раз!", "#2ecc71");
+            }
+        }
+
+        // --- ОБЩИЙ Drag & Drop ---
+        let draggedGeneric = null;
+        document.addEventListener('dragstart', function(e) {
+            if(e.target.hasAttribute('draggable')) draggedGeneric = e.target;
+        });
+        document.addEventListener('dragend', () => draggedGeneric = null);
+
+        document.querySelectorAll('.drop-zone, .dz-code, .cmd-palette, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { 
+                e.preventDefault(); 
+                if(z.classList.contains('drop-zone') || z.classList.contains('dz-code')) z.classList.add('dragover'); 
+            });
+            z.addEventListener('dragleave', () => { 
+                z.classList.remove('dragover'); 
+            });
+            z.addEventListener('drop', e => {
+                e.preventDefault();
+                z.classList.remove('dragover');
+                
+                if(!draggedGeneric) return;
+
+                // Уровень 2
+                if(draggedGeneric.classList.contains('drag-block') && (z.classList.contains('drop-zone') || z.id === 'pal2')) {
+                    if(z.classList.contains('drop-zone') && z.children.length > 0) {
+                        document.getElementById('pal2').appendChild(z.children[0]);
+                    }
+                    if (z.classList.contains('drop-zone')) z.innerHTML = '';
+                    z.appendChild(draggedGeneric);
+                }
+                
+                // Уровень 3
+                if(draggedGeneric.classList.contains('code-block') && (z.classList.contains('dz-code') || z.id === 'pal3')) {
+                    if(z.classList.contains('dz-code') && z.children.length > 0) {
+                        document.getElementById('pal3').appendChild(z.children[0]);
+                    }
+                    if (z.classList.contains('dz-code')) z.innerHTML = '';
+                    z.appendChild(draggedGeneric);
+                }
+            });
+        });
+
+        // --- УРОВЕНЬ 2: cd Command ---
+        function copyPath() {
+            // Создаем блок с путем
+            const pal = document.getElementById('pal2');
+            const pathTxt = document.getElementById('folderPath').innerText;
+            
+            // Проверка, есть ли уже такой
+            let exists = false;
+            pal.childNodes.forEach(n => { if(n.innerText === `"${pathTxt}"`) exists = true; });
+            
+            if(!exists) {
+                const block = document.createElement('div');
+                block.className = 'drag-block';
+                block.setAttribute('draggable', 'true');
+                block.setAttribute('data-val', 'path');
+                block.style.background = '#2ecc71';
+                block.innerText = `"${pathTxt}"`;
+                pal.appendChild(block);
+                
+                // Перенавешиваем события dragstart
+                block.addEventListener('dragstart', function() { draggedGeneric = this; });
+            }
+        }
+
+        function runCd() {
+            let zCmd = document.getElementById('dzCmd');
+            let zPath = document.getElementById('dzPath');
+            let r = document.getElementById('resCd');
+            r.style.display = 'block';
+
+            let cmdOk = zCmd.children.length > 0 && zCmd.children[0].getAttribute('data-val') === 'cd';
+            let pathOk = zPath.children.length > 0 && zPath.children[0].getAttribute('data-val') === 'path';
+
+            if(cmdOk && pathOk) {
+                document.querySelector('#termLine2 .term-prompt').innerText = document.getElementById('folderPath').innerText + ">";
+                zCmd.style.display = 'none'; zPath.style.display = 'none';
+                r.style.color = '#2ecc71';
+                r.innerText = "✅ Идеально! Терминал перешел в папку с файлом. Теперь все команды применяются к твоему проекту!";
+            } else {
+                r.style.color = '#e74c3c';
+                r.innerText = "❌ Ошибка! Нужно поставить команду 'cd', а затем вставить скопированный путь в кавычках.";
+            }
+        }
+
+        // --- УРОВЕНЬ 3: Uvicorn ---
+        function checkUvicorn() {
+            let correct = true, empty = false;
+            document.querySelectorAll('.dz-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.getAttribute('data-val') !== z.dataset.expected) correct = false;
+            });
+            
+            let r = document.getElementById('resCode');
+            r.style.display = 'block';
+            
+            if(empty) { 
+                r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки на места!'; 
+            } else if(correct) { 
+                r.style.background = '#0be881'; r.style.color='#000'; r.innerText = '✅ СЕРВЕР ЗАПУЩЕН! Команда собрана безупречно!'; 
+            } else { 
+                r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка! Структура: Инструмент (uvicorn) -> имя_файла -> : -> имя_переменной -> флаг_обновления.'; 
+            }
+        }
+    </script>
+</body>
+</html>

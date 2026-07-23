@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Эволюция Веба & FastAPI 🌐</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0c10; color: #c5c6c7; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        h1 { color: #66fcf1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5); }
+        
+        .game-container { max-width: 1000px; margin: 0 auto; background: #1f2833; border-radius: 15px; box-shadow: 0 0 20px rgba(102, 252, 241, 0.2); border: 2px solid #45a29e; overflow: hidden; }
+        .tabs { display: flex; background: #0b0c10; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: #0b0c10; color: #777; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
+        .tab-btn.active { color: #fff; background-color: #1f2833; border-bottom: 4px solid #66fcf1; }
+        .tab-btn:hover:not(.active) { background-color: #1a2028; color: #ccc; }
+        
+        .level-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
+        .level-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .instruction { font-size: 20px; color: #45a29e; font-weight: bold; margin-bottom: 15px; }
+        .explanation { color: #aaa; margin-bottom: 20px; font-size: 15px; line-height: 1.5; }
+
+        /* УРОВЕНЬ 1: Зачем нужен Python (Статика vs Динамика) */
+        .web-zone { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .website-card { background: #0b0c10; padding: 20px; border-radius: 10px; width: 45%; border: 2px solid #45a29e; text-align: left; position: relative; }
+        .website-card h3 { margin-top: 0; color: #66fcf1; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        .shop-items { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; }
+        .item { background: #1a2028; padding: 10px; border-radius: 5px; border: 1px solid #333; text-align: center; width: 40%; }
+        .item-price { color: #e5c07b; font-weight: bold; }
+        
+        .btn-update { background: #e74c3c; color: #fff; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: bold; transition: 0.2s; }
+        .btn-update:hover { background: #c0392b; }
+        .btn-update.python { background: #2ecc71; color: #000; }
+        .btn-update.python:hover { background: #27ae60; }
+        
+        .update-msg { font-size: 14px; color: #e74c3c; margin-top: 10px; min-height: 40px; display: none; }
+        .update-msg.success { color: #2ecc71; }
+
+        /* УРОВЕНЬ 2: Выбор Фреймворка */
+        .framework-arena { display: flex; justify-content: space-around; gap: 15px; margin-top: 20px; }
+        .fw-card { background: #111; border: 2px solid #555; border-radius: 10px; padding: 20px; width: 30%; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .fw-card:hover { transform: translateY(-5px); border-color: #f1c40f; }
+        .fw-icon { font-size: 50px; margin-bottom: 10px; }
+        .fw-title { font-size: 22px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+        .fw-desc { color: #aaa; font-size: 14px; line-height: 1.4; }
+        
+        .fw-card.winner { border-color: #0be881; box-shadow: 0 0 20px rgba(11, 232, 129, 0.4); background: #1a2f23; }
+        .winner-stamp { position: absolute; top: 10px; right: -30px; background: #0be881; color: #000; font-weight: bold; padding: 5px 30px; transform: rotate(45deg); font-size: 12px; display: none; }
+        .fw-card.winner .winner-stamp { display: block; }
+        
+        .fw-features { display: flex; justify-content: center; gap: 10px; margin-top: 15px; opacity: 0; transition: 0.5s; }
+        .fw-card.winner .fw-features { opacity: 1; }
+        .feature-badge { background: #0b0c10; border: 1px solid #0be881; color: #0be881; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+
+        /* УРОВЕНЬ 3: Сборка Первого Сайта */
+        .code-workspace { display: flex; gap: 20px; text-align: left; margin-top: 20px; }
+        .palette-code, .editor-code { background: #0b0c10; padding: 20px; border-radius: 10px; width: 50%; border: 1px solid #3498db; }
+        .palette-code h3, .editor-code h3 { color: #3498db; margin-top: 0; text-align: center; }
+        .code-block { background: #1f2833; border-left: 5px solid #3498db; padding: 15px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .code-block:active { cursor: grabbing; }
+        .c-kw { color: #c678dd; } .c-func { color: #61afef; } .c-str { color: #98c379; }
+        
+        .drop-zone-code { background: #111; border: 2px dashed #3498db; height: 50px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 14px; transition: 0.2s; }
+        .drop-zone-code.dragover { border-color: #3498db; background: rgba(52,152,219,0.1); }
+        .drop-zone-code .code-block { margin: 0; width: 100%; box-sizing: border-box; }
+        
+        .btn-check { background: #3498db; color: #fff; border: none; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; transition: 0.2s; text-transform: uppercase; }
+        .btn-check:hover { background: #2980b9; }
+        .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body>
+
+    <h1>🌐 Эволюция Веба: Путь к FastAPI 🚀</h1>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(1)">1. Зачем нужен Python?</button>
+            <button class="tab-btn" onclick="openTab(2)">2. Битва Фреймворков</button>
+            <button class="tab-btn" onclick="openTab(3)">3. Первый Сайт</button>
+        </div>
+
+        <!-- УРОВЕНЬ 1: Зачем нужен Python -->
+        <div id="tab1" class="level-content active">
+            <div class="instruction">⚡ ЗАДАЧА: Попробуй изменить цены в магазине!</div>
+            <div class="explanation">
+                HTML отвечает за то, как сайт выглядит. Но HTML — это просто жесткий текст (статика). Представь, что в магазине 1000 товаров, и тебе нужно обновить все цены к Черной Пятнице. На голом HTML тебе придется переписывать каждую строчку вручную! А Python делает сайт "живым" (динамичным) — он сам может вытащить нужные цены из базы данных и обновить их за секунду.
+            </div>
+            
+            <div class="web-zone">
+                <!-- Статический HTML сайт -->
+                <div class="website-card">
+                    <h3>Только HTML (Статика)</h3>
+                    <div class="shop-items">
+                        <div class="item">📱 Телефон<br><span class="item-price" id="price1-html">1000$</span></div>
+                        <div class="item">💻 Ноутбук<br><span class="item-price" id="price2-html">1500$</span></div>
+                        <div class="item">🎧 Наушники<br><span class="item-price" id="price3-html">200$</span></div>
+                        <div class="item">⌚ Часы<br><span class="item-price" id="price4-html">300$</span></div>
+                    </div>
+                    <button class="btn-update" onclick="updateHtmlSite()">Обновить цены (-20%)</button>
+                    <div class="update-msg" id="msg-html"></div>
+                </div>
+                
+                <!-- Динамический сайт с Python -->
+                <div class="website-card">
+                    <h3>HTML + Python (Динамика)</h3>
+                    <div class="shop-items">
+                        <div class="item">📱 Телефон<br><span class="item-price" id="price1-py">1000$</span></div>
+                        <div class="item">💻 Ноутбук<br><span class="item-price" id="price2-py">1500$</span></div>
+                        <div class="item">🎧 Наушники<br><span class="item-price" id="price3-py">200$</span></div>
+                        <div class="item">⌚ Часы<br><span class="item-price" id="price4-py">300$</span></div>
+                    </div>
+                    <button class="btn-update python" onclick="updatePythonSite()">Запустить скрипт скидок</button>
+                    <div class="update-msg success" id="msg-py"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Выбор Фреймворка -->
+        <div id="tab2" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Выбери идеальный инструмент (Фреймворк)!</div>
+            <div class="explanation">
+                Писать сайт на Python с нуля долго. Поэтому программисты используют <b>Фреймворки</b> — это наборы готовых деталей. Выбери тот, который сочетает в себе скорость, простоту и мощь!
+            </div>
+            
+            <div class="framework-arena">
+                <!-- Django -->
+                <div class="fw-card" id="fwDjango" onclick="selectFramework('Django')">
+                    <div class="fw-icon">🐘</div>
+                    <div class="fw-title">Django</div>
+                    <div class="fw-desc">Очень мощный и надежный, как танк. Но тяжелый и сложный для новичков. Слишком много всего "из коробки".</div>
+                </div>
+                
+                <!-- Flask -->
+                <div class="fw-card" id="fwFlask" onclick="selectFramework('Flask')">
+                    <div class="fw-icon">🌶️</div>
+                    <div class="fw-title">Flask</div>
+                    <div class="fw-desc">Легкий и гибкий, как велосипед. Легко начать, но для больших сайтов придется прикручивать много дополнительных деталей самому.</div>
+                </div>
+
+                <!-- FastAPI -->
+                <div class="fw-card" id="fwFastAPI" onclick="selectFramework('FastAPI')">
+                    <div class="winner-stamp">ПОБЕДИТЕЛЬ!</div>
+                    <div class="fw-icon">🚀</div>
+                    <div class="fw-title">FastAPI</div>
+                    <div class="fw-desc">Современная ракета! Берет лучшее от обоих: быстрый в работе, простой в написании кода и очень мощный благодаря автоматической проверке данных!</div>
+                    <div class="fw-features">
+                        <div class="feature-badge">Простой</div>
+                        <div class="feature-badge">Быстрый</div>
+                        <div class="feature-badge">Мощный</div>
+                    </div>
+                </div>
+            </div>
+            <p id="fwRes" style="font-weight: bold; margin-top: 20px; font-size: 18px; min-height: 25px;"></p>
+        </div>
+
+        <!-- УРОВЕНЬ 3: Сборка Первого Сайта -->
+        <div id="tab3" class="level-content">
+            <div class="instruction">⚡ ЗАДАЧА: Собери свой первый сайт на FastAPI!</div>
+            <div class="explanation">
+                Посмотри, как мало кода нужно, чтобы запустить настоящий сервер. Расставь блоки в правильном порядке!
+            </div>
+            
+            <div class="code-workspace">
+                <div class="palette-code" id="codePal">
+                    <h3>Детали кода</h3>
+                    <div class="code-block" draggable="true" id="b3"><span class="c-kw">@app.get</span>(<span class="c-str">"/"</span>)</div>
+                    <div class="code-block" draggable="true" id="b5">&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> <span class="c-str">"Hello World!"</span></div>
+                    <div class="code-block" draggable="true" id="b2">app = FastAPI()</div>
+                    <div class="code-block" draggable="true" id="b4"><span class="c-kw">def</span> <span class="c-func">index</span>():</div>
+                    <div class="code-block" draggable="true" id="b1"><span class="c-kw">from</span> fastapi <span class="c-kw">import</span> FastAPI</div>
+                </div>
+                
+                <div class="editor-code">
+                    <h3>Файл main.py</h3>
+                    <div class="drop-zone-code" data-expected="b1" data-hint="1. Подключаем инструмент">1. Подключаем инструмент[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b2" data-hint="2. Создаем приложение">2. Создаем приложение[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b3" data-hint="3. Указываем путь (главная страница)">3. Указываем путь (главная страница)[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b4" data-hint="4. Пишем функцию">4. Пишем функцию[cite: 11]</div>
+                    <div class="drop-zone-code" data-expected="b5" data-hint="5. Возвращаем текст (Ответ)">5. Возвращаем текст (Ответ)[cite: 11]</div>
+                </div>
+            </div>
+            <button class="btn-check" onclick="checkFastApiCode()">ЗАПУСТИТЬ СЕРВЕР ▶️</button>
+            <div id="resCode" class="res-msg"></div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(n) {
+            document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab'+n).classList.add('active');
+            document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
+        }
+
+        // --- УРОВЕНЬ 1: Статика vs Динамика ---
+        let htmlPrices = [1000, 1500, 200, 300];
+        let pyPrices = [1000, 1500, 200, 300];
+        
+        function updateHtmlSite() {
+            const msg = document.getElementById('msg-html');
+            msg.style.display = 'block';
+            msg.innerHTML = "❌ Ошибка! Это статический HTML. Тебе придется открыть код страницы, найти каждую цену и пересчитать её на калькуляторе вручную!";
+            document.querySelector('.website-card').style.animation = 'shake 0.4s';
+            setTimeout(() => document.querySelector('.website-card').style.animation = '', 400);
+        }
+
+        function updatePythonSite() {
+            const msg = document.getElementById('msg-py');
+            msg.style.display = 'block';
+            
+            // Имитация работы скрипта
+            msg.innerHTML = "⏳ Подключение к базе данных... Пересчет цен...";
+            
+            setTimeout(() => {
+                for(let i=1; i<=4; i++) {
+                    let newPrice = pyPrices[i-1] * 0.8; // Скидка 20%
+                    document.getElementById('price' + i + '-py').innerText = newPrice + '$';
+                }
+                msg.innerHTML = "✅ Успех! Python скрипт обошел базу данных и мгновенно обновил все цены на сайте!";
+            }, 800);
+        }
+
+        // --- УРОВЕНЬ 2: Битва Фреймворков ---
+        function selectFramework(fw) {
+            const res = document.getElementById('fwRes');
+            document.querySelectorAll('.fw-card').forEach(c => c.classList.remove('winner'));
+            
+            if(fw === 'Django') {
+                res.style.color = '#e74c3c';
+                res.innerText = "❌ Django крут, но слишком громоздкий для нашего быстрого старта.";
+            } else if (fw === 'Flask') {
+                res.style.color = '#f1c40f';
+                res.innerText = "⚠️ Flask хорош, но мы хотим современный подход с автоматическими проверками.";
+            } else if (fw === 'FastAPI') {
+                res.style.color = '#0be881';
+                res.innerText = "✅ ОТЛИЧНЫЙ ВЫБОР! FastAPI — это современный стандарт: Простой, Быстрый и невероятно Мощный!";
+                document.getElementById('fwFastAPI').classList.add('winner');
+            }
+        }
+
+        // --- УРОВЕНЬ 3: Сборка Первого Сайта ---
+        let draggedBlock = null;
+        document.querySelectorAll('.code-block').forEach(b => {
+            b.addEventListener('dragstart', function() { draggedBlock = this; });
+        });
+
+        document.querySelectorAll('.drop-zone-code, .palette-code').forEach(z => {
+            z.addEventListener('dragover', e => { e.preventDefault(); if(z.classList.contains('drop-zone-code')) z.classList.add('dragover'); });
+            z.addEventListener('dragleave', () => { if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover'); });
+            z.addEventListener('drop', e => {
+                e.preventDefault();
+                if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
+                
+                if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
+                    document.getElementById('codePal').appendChild(z.children[0]);
+                }
+                if(draggedBlock && draggedBlock.classList.contains('code-block')) {
+                    if(z.classList.contains('drop-zone-code')) z.innerHTML = '';
+                    z.appendChild(draggedBlock);
+                }
+            });
+        });
+
+        function checkFastApiCode() {
+            let correct = true, empty = false;
+            document.querySelectorAll('.drop-zone-code').forEach(z => {
+                if(!z.firstElementChild) empty = true;
+                else if(z.firstElementChild.id !== z.dataset.expected) correct = false;
+            });
+            
+            let r = document.getElementById('resCode');
+            r.style.display = 'block';
+            
+            if(empty) { 
+                r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки на места!'; 
+            } else if(correct) { 
+                r.style.background = '#0be881'; r.style.color='#000'; r.innerText = '✅ ПОЗДРАВЛЯЮ! Всего 5 строк кода, и твой первый полноценный сервер на FastAPI запущен[cite: 11]!'; 
+            } else { 
+                r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка в структуре! Вспомни: Импорт -> app -> Декоратор -> Функция -> Return.'; 
+            }
+        }
+    </script>
+</body>
+</html>
