@@ -11,8 +11,8 @@
         
         .game-container { background: white; width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; }
         
-        .tabs { display: flex; background-color: #81c784; }
-        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: none; cursor: pointer; transition: 0.3s; color: white; border-bottom: 4px solid transparent; }
+        .tabs { display: flex; background-color: #81c784; flex-wrap: wrap; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 15px; font-weight: bold; border: none; background: none; cursor: pointer; transition: 0.3s; color: white; border-bottom: 4px solid transparent; min-width: 200px; }
         .tab-btn.active { background-color: #4caf50; border-bottom: 4px solid #1b5e20; }
         .tab-btn:hover { background-color: #66bb6a; }
         
@@ -27,7 +27,7 @@
         .quiz-option:hover { background: #a5d6a7; transform: scale(1.02); }
         .quiz-feedback { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 25px; }
 
-        /* --- УРОВЕНЬ 2: Связи (Атрибуты) --- */
+        /* --- УРОВЕНЬ 2: Соедини Атрибуты --- */
         .match-container { display: flex; justify-content: space-around; margin-top: 20px; }
         .match-column { display: flex; flex-direction: column; gap: 15px; width: 40%; }
         .match-btn { background: #fff9c4; border: 2px solid #fbc02d; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
@@ -41,21 +41,31 @@
         .html-tag { color: #e06c75; }
         .html-attr { color: #d19a66; }
         .html-val { color: #98c379; }
-        .builder-btn { background: #4caf50; color: white; border: none; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 100%; }
+        .builder-btn { background: #4caf50; color: white; border: none; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.2s; }
         .builder-btn:hover { background: #388e3c; }
+
+        /* --- УРОВЕНЬ 4: Сборка Скелета --- */
+        .tags-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; min-height: 60px; background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px dashed #4caf50; }
+        .tag-block { background: #81c784; color: #1b5e20; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-family: monospace; font-size: 18px; font-weight: bold; user-select: none; transition: 0.2s; border: 2px solid #4caf50; }
+        .tag-block:hover { background: #66bb6a; transform: scale(1.05); }
+        .assembly-zone { display: flex; flex-direction: column; gap: 5px; background: #282c34; padding: 20px; border-radius: 8px; min-height: 300px; align-items: flex-start; }
+        .assembly-zone .tag-block { background: #e06c75; color: white; border-color: #c9302c; margin: 0; align-self: flex-start; }
+        .indent-1 { margin-left: 30px !important; }
+        .indent-2 { margin-left: 60px !important; }
 
     </style>
 </head>
 <body>
 
     <h1>⛏️ Мастер HTML-Разметки: Урок 2 ⛏️</h1>
-    <p>Собери свою страницу про мобов, как собираешь блоки в игре!</p>
+    <p>Создавай списки, таблицы и связи, как настоящий программист!</p>
 
     <div class="game-container">
         <div class="tabs">
             <button class="tab-btn active" onclick="openLevel(1)">1. Тест на Крафтера</button>
             <button class="tab-btn" onclick="openLevel(2)">2. Соедини Атрибуты</button>
             <button class="tab-btn" onclick="openLevel(3)">3. Крафт Таблицы</button>
+            <button class="tab-btn" onclick="openLevel(4)">4. Сборка Скелета</button>
         </div>
 
         <!-- УРОВЕНЬ 1: Викторина -->
@@ -107,6 +117,21 @@
             <div id="table-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:15px; min-height: 25px;"></div>
         </div>
 
+        <!-- УРОВЕНЬ 4: Сборка Скелета -->
+        <div id="level4" class="level-content">
+            <h2 style="text-align:center; color: #2e7d32; margin-top:0;">Правильная структура</h2>
+            <p style="text-align:center;">Собери самый простой HTML-сайт. Кликай по блокам по порядку, чтобы отправить их в редактор кода!</p>
+
+            <div class="tags-pool" id="pool"></div>
+            <div class="assembly-zone" id="zone"></div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button class="builder-btn" style="width: auto; margin: 0;" onclick="checkOrder()">Проверить код!</button>
+                <button class="builder-btn" style="width: auto; margin: 0; background: #d32f2f;" onclick="resetGame()">Сбросить</button>
+            </div>
+            <div id="skeleton-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:15px; min-height: 25px;"></div>
+        </div>
+
     </div>
 
     <script>
@@ -129,7 +154,7 @@
 
         function loadQuestion() {
             if(currentQ >= questions.length) {
-                document.getElementById('q-text').innerText = "🎉 Все вопросы пройдены! Переходи к следующему уровню.";
+                document.getElementById('q-text').innerText = "🎉 Все вопросы пройдены! Выбирай следующий уровень в меню.";
                 document.getElementById('q-options').innerHTML = "";
                 return;
             }
@@ -164,19 +189,15 @@
             const btn = document.getElementById(id);
             if(btn.classList.contains('matched')) return;
 
-            // Если кликнули по левой колонке (теги)
             if(id.startsWith('tag')) {
                 if(selectedTag) document.getElementById(selectedTag.id).classList.remove('selected');
                 selectedTag = { id, type: typeMatch };
                 btn.classList.add('selected');
-            } 
-            // Если кликнули по правой колонке (атрибуты)
-            else {
+            } else {
                 if(selectedAttr) document.getElementById(selectedAttr.id).classList.remove('selected');
                 selectedAttr = { id, type: typeMatch };
                 btn.classList.add('selected');
             }
-
             checkMatch();
         }
 
@@ -217,6 +238,98 @@
                 fb.innerText = "❌ Где-то ошибка в структуре таблицы (tr - строки, td - ячейки).";
             }
         }
+
+        // --- УРОВЕНЬ 4: Сборка Скелета ---
+        const correctOrder = [
+            "<html>",
+            "<head>",
+            "<title>123</title>",
+            "</head>",
+            "<body>",
+            "<h1>Привет!</h1>",
+            "</body>",
+            "</html>"
+        ];
+
+        let currentAssembly = [];
+
+        function shuffle(array) {
+            return array.slice().sort(() => Math.random() - 0.5);
+        }
+
+        function initSkeletonGame() {
+            const pool = document.getElementById('pool');
+            pool.innerHTML = '';
+            document.getElementById('zone').innerHTML = '';
+            document.getElementById('skeleton-feedback').innerText = '';
+            currentAssembly = [];
+
+            const shuffled = shuffle(correctOrder);
+            shuffled.forEach(tag => {
+                const div = document.createElement('div');
+                div.className = 'tag-block';
+                div.innerText = tag; // innerText автоматически экранирует < и >
+                div.onclick = () => moveToZone(div, tag);
+                pool.appendChild(div);
+            });
+        }
+
+        function moveToZone(element, tag) {
+            const zone = document.getElementById('zone');
+            const pool = document.getElementById('pool');
+
+            if (element.parentElement === pool) {
+                // Перемещаем в зону сборки
+                currentAssembly.push(tag);
+                
+                // Делаем красивые отступы для вложенных тегов
+                let indentClass = '';
+                if (tag === '<head>' || tag === '</head>' || tag === '<body>' || tag === '</body>') indentClass = 'indent-1';
+                if (tag === '<title>123</title>' || tag === '<h1>Привет!</h1>') indentClass = 'indent-2';
+                if (indentClass) element.classList.add(indentClass);
+
+                zone.appendChild(element);
+            } else {
+                // Возвращаем обратно
+                element.classList.remove('indent-1', 'indent-2');
+                const index = currentAssembly.indexOf(tag);
+                if (index > -1) currentAssembly.splice(index, 1);
+                pool.appendChild(element);
+            }
+        }
+
+        function checkOrder() {
+            const fb = document.getElementById('skeleton-feedback');
+            if (currentAssembly.length < correctOrder.length) {
+                fb.style.color = "#d32f2f";
+                fb.innerText = "⚠️ Ты использовал не все блоки!";
+                return;
+            }
+
+            let isCorrect = true;
+            for (let i = 0; i < correctOrder.length; i++) {
+                if (currentAssembly[i] !== correctOrder[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if (isCorrect) {
+                fb.style.color = "green";
+                fb.innerText = "✅ Идеально! Скелет HTML собран абсолютно верно!";
+            } else {
+                fb.style.color = "red";
+                fb.innerText = "❌ Ошибка в порядке тегов. Кликни по красному блоку, чтобы вернуть его назад и попробовать снова.";
+            }
+        }
+
+        function resetGame() {
+            initSkeletonGame();
+        }
+
+        // Инициализация при загрузке страницы
+        initSkeletonGame();
+
     </script>
 </body>
 </html>
