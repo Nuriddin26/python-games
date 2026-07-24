@@ -9,15 +9,20 @@
         h1 { color: #2e7d32; margin-bottom: 5px; text-align: center; }
         p { color: #555; margin-bottom: 20px; text-align: center; font-size: 16px; }
         
-        .game-container { background: white; width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .game-container { background: white; width: 100%; max-width: 950px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; }
         
         .tabs { display: flex; background-color: #81c784; flex-wrap: wrap; }
-        .tab-btn { flex: 1; padding: 15px; font-size: 15px; font-weight: bold; border: none; background: none; cursor: pointer; transition: 0.3s; color: white; border-bottom: 4px solid transparent; min-width: 200px; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 15px; font-weight: bold; border: none; background: none; cursor: pointer; transition: 0.3s; color: white; border-bottom: 4px solid transparent; min-width: 180px; }
         .tab-btn.active { background-color: #4caf50; border-bottom: 4px solid #1b5e20; }
         .tab-btn:hover { background-color: #66bb6a; }
         
         .level-content { display: none; padding: 30px; min-height: 400px; }
         .level-content.active { display: block; }
+
+        /* --- ОБЩИЕ ЭЛЕМЕНТЫ --- */
+        .instruction { font-size: 18px; font-weight: bold; color: #1b5e20; text-align: center; margin-bottom: 20px; }
+        .builder-btn { background: #4caf50; color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .builder-btn:hover { background: #388e3c; }
 
         /* --- УРОВЕНЬ 1: Викторина --- */
         .quiz-card { background: #f1f8e9; border: 2px solid #81c784; border-radius: 10px; padding: 20px; text-align: center; }
@@ -27,7 +32,7 @@
         .quiz-option:hover { background: #a5d6a7; transform: scale(1.02); }
         .quiz-feedback { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 25px; }
 
-        /* --- УРОВЕНЬ 2: Соедини Атрибуты --- */
+        /* --- УРОВЕНЬ 2: Атрибуты --- */
         .match-container { display: flex; justify-content: space-around; margin-top: 20px; }
         .match-column { display: flex; flex-direction: column; gap: 15px; width: 40%; }
         .match-btn { background: #fff9c4; border: 2px solid #fbc02d; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
@@ -35,16 +40,44 @@
         .match-btn.matched { background: #c8e6c9; border-color: #388e3c; color: #1b5e20; cursor: default; opacity: 0.8; }
         .match-btn.error { background: #ffcdd2; border-color: #d32f2f; }
 
-        /* --- УРОВЕНЬ 3: Сборка Таблицы --- */
-        .code-builder { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 10px; font-family: monospace; font-size: 18px; line-height: 1.6; }
-        .code-builder select { font-family: monospace; font-size: 16px; padding: 5px; border-radius: 5px; background: #e0e0e0; border: none; outline: none; font-weight: bold; color: #d32f2f; }
-        .html-tag { color: #e06c75; }
-        .html-attr { color: #d19a66; }
-        .html-val { color: #98c379; }
-        .builder-btn { background: #4caf50; color: white; border: none; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.2s; }
-        .builder-btn:hover { background: #388e3c; }
+        /* --- ОБЩИЕ СТИЛИ ДЛЯ АНАТОМИИ (Списки и Таблицы) --- */
+        .builder-game { display: flex; gap: 20px; align-items: flex-start; }
+        .visual-panel { flex: 1; background: #fff3e0; border: 3px solid #ff9800; border-radius: 10px; padding: 15px; }
+        .code-panel { flex: 1; background: #282c34; border-radius: 10px; padding: 15px; color: #abb2bf; font-family: monospace; font-size: 16px; min-height: 300px; white-space: pre-wrap; text-align: left;}
+        .c-tag { color: #e06c75; } .c-text { color: #98c379; }
+        .controls-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
 
-        /* --- УРОВЕНЬ 4: Сборка Скелета --- */
+        /* --- УРОВЕНЬ 3: Анатомия Списков --- */
+        .btn-ul { background: #43a047; color: white; border: none; padding: 10px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-ol { background: #f4511e; color: white; border: none; padding: 10px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-li { background: #8e24aa; color: white; border: none; padding: 10px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-ul:hover { background: #2e7d32; } .btn-ol:hover { background: #d84315; } .btn-li:hover { background: #6a1b9a; }
+        .btn-li:disabled { background: #ccc; cursor: not-allowed; }
+
+        .viz-list-container { background: white; padding: 15px; border: 2px solid #333; min-height: 100px; border-radius: 5px; position: relative; display: flex; flex-direction: column; gap: 5px; }
+        .viz-list-box { border: 3px solid; padding: 25px 10px 10px 10px; border-radius: 5px; position: relative; min-height: 50px; display: flex; flex-direction: column; gap: 5px; }
+        .viz-list-box.ul-type { border-color: #43a047; background: #e8f5e9; }
+        .viz-list-box.ol-type { border-color: #f4511e; background: #fbe9e7; }
+        
+        .viz-list-label { position: absolute; top: -12px; left: 10px; font-size: 12px; font-weight: bold; padding: 0 5px; }
+        .viz-list-box.ul-type .viz-list-label { color: #2e7d32; background: #e8f5e9; }
+        .viz-list-box.ol-type .viz-list-label { color: #d84315; background: #fbe9e7; }
+
+        .viz-li-item { background: white; border: 2px solid #8e24aa; padding: 8px; border-radius: 3px; font-weight: bold; color: #4a148c; font-size: 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .viz-li-item::before { content: "<li>"; font-size: 10px; background: #e1bee7; padding: 2px 5px; border-radius: 3px; color: #4a148c;}
+
+        /* --- УРОВЕНЬ 4: Анатомия Таблицы --- */
+        .btn-tr { background: #2196f3; color: white; border: none; padding: 10px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-td { background: #9c27b0; color: white; border: none; padding: 10px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-tr:hover { background: #1976d2; } .btn-td:hover { background: #7b1fa2; }
+        .btn-td:disabled { background: #ccc; cursor: not-allowed; }
+
+        .viz-table { display: flex; flex-direction: column; gap: 5px; background: white; padding: 10px; border: 2px solid #333; min-height: 100px; border-radius: 5px; }
+        .viz-tr { display: flex; gap: 5px; background: #bbdefb; border: 3px solid #2196f3; padding: 5px; border-radius: 5px; min-height: 50px; align-items: center; position: relative; margin-top: 10px;}
+        .viz-tr::before { content: "<tr> (Строка)"; position: absolute; top: -14px; left: 5px; font-size: 10px; font-weight: bold; color: #1565c0; background: #bbdefb; padding: 0 5px; border-radius: 3px;}
+        .viz-td { flex: 1; background: #e1bee7; border: 2px solid #9c27b0; height: 40px; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #4a148c; border-radius: 3px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+
+        /* --- УРОВЕНЬ 5: Сборка Скелета --- */
         .tags-pool { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; min-height: 60px; background: #e8f5e9; padding: 15px; border-radius: 8px; border: 2px dashed #4caf50; }
         .tag-block { background: #81c784; color: #1b5e20; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-family: monospace; font-size: 18px; font-weight: bold; user-select: none; transition: 0.2s; border: 2px solid #4caf50; }
         .tag-block:hover { background: #66bb6a; transform: scale(1.05); }
@@ -62,10 +95,11 @@
 
     <div class="game-container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="openLevel(1)">1. Тест на Крафтера</button>
-            <button class="tab-btn" onclick="openLevel(2)">2. Соедини Атрибуты</button>
-            <button class="tab-btn" onclick="openLevel(3)">3. Крафт Таблицы</button>
-            <button class="tab-btn" onclick="openLevel(4)">4. Сборка Скелета</button>
+            <button class="tab-btn active" onclick="openLevel(1)">1. Тест</button>
+            <button class="tab-btn" onclick="openLevel(2)">2. Атрибуты</button>
+            <button class="tab-btn" onclick="openLevel(3)">3. Анатомия Списков</button>
+            <button class="tab-btn" onclick="openLevel(4)">4. Анатомия Таблицы</button>
+            <button class="tab-btn" onclick="openLevel(5)">5. Скелет</button>
         </div>
 
         <!-- УРОВЕНЬ 1: Викторина -->
@@ -79,15 +113,14 @@
 
         <!-- УРОВЕНЬ 2: Соедини Атрибуты -->
         <div id="level2" class="level-content">
-            <h2 style="text-align:center; color: #2e7d32; margin-top:0;">Какой атрибут нужен тегу?</h2>
-            <p style="text-align:center;">Кликни на тег слева, а затем на его помощника справа!</p>
+            <div class="instruction">Какой атрибут нужен тегу? Кликни на тег слева, а затем на его помощника справа!</div>
             <div class="match-container">
-                <div class="match-column" id="tags-col">
+                <div class="match-column">
                     <button class="match-btn" id="tag1" onclick="selectItem('tag1', 'img')">&lt;img&gt; (Картинка)</button>
                     <button class="match-btn" id="tag2" onclick="selectItem('tag2', 'a')">&lt;a&gt; (Ссылка)</button>
                     <button class="match-btn" id="tag3" onclick="selectItem('tag3', 'table')">&lt;table&gt; (Таблица)</button>
                 </div>
-                <div class="match-column" id="attrs-col">
+                <div class="match-column">
                     <button class="match-btn" id="attr1" onclick="selectItem('attr1', 'a')">href="..."</button>
                     <button class="match-btn" id="attr2" onclick="selectItem('attr2', 'table')">border="1"</button>
                     <button class="match-btn" id="attr3" onclick="selectItem('attr3', 'img')">src="..."</button>
@@ -96,38 +129,66 @@
             <div id="match-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:20px; min-height: 25px;"></div>
         </div>
 
-        <!-- УРОВЕНЬ 3: Сборка Таблицы -->
+        <!-- УРОВЕНЬ 3: Анатомия Списков -->
         <div id="level3" class="level-content">
-            <h2 style="text-align:center; color: #2e7d32; margin-top:0;">Скрафти таблицу мобов!</h2>
-            <p style="text-align:center;">Заполни пропуски правильными тегами, чтобы зомби и криперы появились на сайте.</p>
+            <div class="instruction">Выбери коробку-список (ul или ol), а затем добавляй в неё пункты (li).</div>
             
-            <div class="code-builder">
-                <span class="html-tag">&lt;table</span> <span class="html-attr">border</span>=<span class="html-val">"1"</span><span class="html-tag">&gt;</span><br>
-                &nbsp;&nbsp;<select id="sel1"><option value="0">...</option><option value="tr">&lt;tr&gt;</option><option value="td">&lt;td&gt;</option><option value="ul">&lt;ul&gt;</option></select><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<span class="html-tag">&lt;td&gt;</span>Зомби<span class="html-tag">&lt;/td&gt;</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<select id="sel2"><option value="0">...</option><option value="td">&lt;td&gt;</option><option value="a">&lt;a&gt;</option><option value="tr">&lt;tr&gt;</option></select>Горит на солнце<span class="html-tag">&lt;/td&gt;</span><br>
-                &nbsp;&nbsp;<span class="html-tag">&lt;/tr&gt;</span><br>
-                &nbsp;&nbsp;<span class="html-tag">&lt;tr&gt;</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<span class="html-tag">&lt;td&gt;</span>Крипер<span class="html-tag">&lt;/td&gt;</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<span class="html-tag">&lt;td&gt;</span>Взрывается<span class="html-tag">&lt;/td&gt;</span><br>
-                &nbsp;&nbsp;<select id="sel3"><option value="0">...</option><option value="table">&lt;/table&gt;</option><option value="tr">&lt;/tr&gt;</option><option value="td">&lt;/td&gt;</option></select><br>
-                <span class="html-tag">&lt;/table&gt;</span>
+            <div class="controls-row">
+                <button class="btn-ul" onclick="createList('ul')">Создать &lt;ul&gt; (С точками)</button>
+                <button class="btn-ol" onclick="createList('ol')">Создать &lt;ol&gt; (С цифрами)</button>
+                <button class="btn-li" id="btn-add-li" onclick="addListItem()" disabled>+ &lt;li&gt; (Пункт списка)</button>
+                <button class="builder-btn" style="background:#d32f2f;" onclick="resetListGame()">Сбросить</button>
             </div>
-            <button class="builder-btn" onclick="checkTable()">Проверить код!</button>
-            <div id="table-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:15px; min-height: 25px;"></div>
+
+            <div class="builder-game">
+                <!-- Визуализация -->
+                <div class="visual-panel">
+                    <h3 style="margin-top:0; color:#e65100; text-align:center;">Браузер видит это так:</h3>
+                    <div class="viz-list-container" id="vizList">
+                        <span style="color:#64b5f6; font-style:italic; font-size:14px; text-align:center;">Выбери тип списка (ul или ol)...</span>
+                    </div>
+                </div>
+
+                <!-- Код -->
+                <div class="code-panel" id="codeList">
+<span style="color:#5c6370;">// Код появится здесь...</span></div>
+            </div>
         </div>
 
-        <!-- УРОВЕНЬ 4: Сборка Скелета -->
+        <!-- УРОВЕНЬ 4: Анатомия Таблицы -->
         <div id="level4" class="level-content">
-            <h2 style="text-align:center; color: #2e7d32; margin-top:0;">Правильная структура</h2>
-            <p style="text-align:center;">Собери самый простой HTML-сайт. Кликай по блокам по порядку, чтобы отправить их в редактор кода!</p>
+            <div class="instruction">Сначала создай СТРОКУ (tr), а затем вкладывай в неё ЯЧЕЙКИ (td).</div>
+            
+            <div class="controls-row">
+                <button class="btn-tr" onclick="addTableRow()">+ &lt;tr&gt; (Создать строку)</button>
+                <button class="btn-td" id="btn-add-td" onclick="addTableCell()" disabled>+ &lt;td&gt; (Ячейка в строку)</button>
+                <button class="builder-btn" style="background:#d32f2f;" onclick="resetTable()">Сбросить</button>
+            </div>
+
+            <div class="builder-game">
+                <!-- Визуализация -->
+                <div class="visual-panel">
+                    <h3 style="margin-top:0; color:#e65100; text-align:center;">Браузер видит это так:</h3>
+                    <div class="viz-table" id="vizTable">
+                        <!-- Сюда добавляются tr и td -->
+                    </div>
+                </div>
+
+                <!-- Код -->
+                <div class="code-panel" id="codeTable"></div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 5: Сборка Скелета -->
+        <div id="level5" class="level-content">
+            <div class="instruction">Собери самый простой HTML-сайт. Кликай по блокам по порядку!</div>
 
             <div class="tags-pool" id="pool"></div>
             <div class="assembly-zone" id="zone"></div>
 
             <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
                 <button class="builder-btn" style="width: auto; margin: 0;" onclick="checkOrder()">Проверить код!</button>
-                <button class="builder-btn" style="width: auto; margin: 0; background: #d32f2f;" onclick="resetGame()">Сбросить</button>
+                <button class="builder-btn" style="width: auto; margin: 0; background: #d32f2f;" onclick="resetSkeletonGame()">Сбросить</button>
             </div>
             <div id="skeleton-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:15px; min-height: 25px;"></div>
         </div>
@@ -144,11 +205,11 @@
 
         // --- УРОВЕНЬ 1: Викторина ---
         const questions = [
-            { q: "HTML — это язык программирования?", options: ["Да, на нем пишут сложную логику", "Нет, это язык разметки (каркас сайта)"], a: 1 },
-            { q: "В чем разница между списками <ol> и <ul>?", options: ["<ol> — нумерованный (1, 2, 3), <ul> — маркированный (точки)", "<ol> — для текста, <ul> — для картинок"], a: 0 },
+            { q: "Что означает тег <tr> в таблице?", options: ["Table Row (Строка по горизонтали)", "Table Data (Отдельная ячейка-кубик)"], a: 0 },
+            { q: "Какой список мы используем, если нам ВАЖЕН порядок (например, 1-е, 2-е, 3-е место)?", options: ["<ul> (Unordered List)", "<ol> (Ordered List)"], a: 1 },
             { q: "Какой тег создает отдельную ячейку (столбец) внутри таблицы?", options: ["<tr>", "<td>", "<table>"], a: 1 },
-            { q: "Как правильно связать страницу index.html с mob.html?", options: ["<a href=\"mob.html\">Мобы</a>", "<link src=\"mob.html\">"], a: 0 },
-            { q: "Как быстро открыть готовую HTML-страницу из VS Code в браузере?", options: ["Нажать правую кнопку мыши по файлу -> Copy Path (и вставить в браузер)", "Написать в коде команду OPEN"], a: 0 }
+            { q: "Как расшифровывается <ul>?", options: ["Unordered List (Список с точками)", "Useful Link (Полезная ссылка)"], a: 0 },
+            { q: "Где должны находиться теги <td>?", options: ["Просто внутри <table>", "Строго внутри строки <tr>"], a: 1 }
         ];
         let currentQ = 0;
 
@@ -223,23 +284,135 @@
             }
         }
 
-        // --- УРОВЕНЬ 3: Сборка Таблицы ---
-        function checkTable() {
-            const s1 = document.getElementById('sel1').value;
-            const s2 = document.getElementById('sel2').value;
-            const s3 = document.getElementById('sel3').value;
-            const fb = document.getElementById('table-feedback');
+        // --- УРОВЕНЬ 3: Анатомия Списков ---
+        let currentListType = null;
+        let currentLiCount = 0;
 
-            if(s1 === "tr" && s2 === "td" && s3 === "tr") {
-                fb.style.color = "green";
-                fb.innerText = "✅ Идеально! Таблица построена без ошибок.";
-            } else {
-                fb.style.color = "red";
-                fb.innerText = "❌ Где-то ошибка в структуре таблицы (tr - строки, td - ячейки).";
-            }
+        function createList(type) {
+            currentListType = type;
+            currentLiCount = 0; 
+            document.getElementById('btn-add-li').disabled = false;
+            renderListVisuals();
+            renderListCode();
         }
 
-        // --- УРОВЕНЬ 4: Сборка Скелета ---
+        function addListItem() {
+            if(!currentListType) return;
+            currentLiCount++;
+            renderListVisuals();
+            renderListCode();
+        }
+
+        function resetListGame() {
+            currentListType = null;
+            currentLiCount = 0;
+            document.getElementById('btn-add-li').disabled = true;
+            renderListVisuals();
+            renderListCode();
+        }
+
+        function renderListVisuals() {
+            const viz = document.getElementById('vizList');
+            if(!currentListType) {
+                viz.innerHTML = '<span style="color:#64b5f6; font-style:italic; font-size:14px; text-align:center;">Выбери тип списка (ul или ol)...</span>';
+                return;
+            }
+
+            let title = currentListType === 'ul' ? 'Маркированный (Точки)' : 'Нумерованный (Цифры)';
+            let html = `<div class="viz-list-box ${currentListType}-type">`;
+            html += `<div class="viz-list-label">&lt;${currentListType}&gt; ${title}</div>`;
+            
+            if(currentLiCount === 0) {
+                 html += '<span style="color:#777; font-style:italic; font-size:12px; margin-top: 5px;">Пустой список (нажми добавить li)</span>';
+            }
+
+            for(let i=0; i<currentLiCount; i++) {
+                let marker = currentListType === 'ul' ? '🟣' : `<span style="background:#f4511e; color:white; padding:2px 6px; border-radius:50%; font-size:12px;">${i+1}</span>`;
+                html += `<div class="viz-li-item"><span>${marker}</span> Элемент списка</div>`;
+            }
+            html += `</div>`;
+            viz.innerHTML = html;
+        }
+
+        function renderListCode() {
+            const codePanel = document.getElementById('codeList');
+            if(!currentListType) {
+                codePanel.innerHTML = '<span style="color:#5c6370;">// Код появится здесь...</span>';
+                return;
+            }
+
+            let codeStr = `<span class="c-tag">&lt;${currentListType}&gt;</span>\n`;
+            for(let i=0; i<currentLiCount; i++) {
+                codeStr += `  <span class="c-tag">&lt;li&gt;</span><span class="c-text">Элемент списка</span><span class="c-tag">&lt;/li&gt;</span>\n`;
+            }
+            codeStr += `<span class="c-tag">&lt;/${currentListType}&gt;</span>`;
+            codePanel.innerHTML = codeStr;
+        }
+
+        // --- УРОВЕНЬ 4: Анатомия Таблицы ---
+        let tableData = []; 
+
+        function renderTableCode() {
+            let codeHtml = `<span class="c-tag">&lt;table</span> border="1"<span class="c-tag">&gt;</span>\n`;
+            
+            tableData.forEach(row => {
+                codeHtml += `  <span class="c-tag">&lt;tr&gt;</span>\n`;
+                row.forEach(cell => {
+                    codeHtml += `    <span class="c-tag">&lt;td&gt;</span><span class="c-text">Ячейка</span><span class="c-tag">&lt;/td&gt;</span>\n`;
+                });
+                codeHtml += `  <span class="c-tag">&lt;/tr&gt;</span>\n`;
+            });
+            
+            codeHtml += `<span class="c-tag">&lt;/table&gt;</span>`;
+            document.getElementById('codeTable').innerHTML = codeHtml;
+        }
+
+        function renderVisualTable() {
+            const viz = document.getElementById('vizTable');
+            viz.innerHTML = '';
+
+            tableData.forEach((row, rIndex) => {
+                const trDiv = document.createElement('div');
+                trDiv.className = 'viz-tr';
+                
+                if(row.length === 0) {
+                    trDiv.innerHTML = '<span style="color:#64b5f6; font-style:italic; font-size:12px; margin-left: 10px; margin-top: 10px;">Пустая строка (нажми добавить td)</span>';
+                }
+
+                row.forEach((cell, cIndex) => {
+                    const tdDiv = document.createElement('div');
+                    tdDiv.className = 'viz-td';
+                    tdDiv.innerText = `<td>`;
+                    trDiv.appendChild(tdDiv);
+                });
+                
+                viz.appendChild(trDiv);
+            });
+
+            document.getElementById('btn-add-td').disabled = tableData.length === 0;
+        }
+
+        function addTableRow() {
+            tableData.push([]);
+            renderVisualTable();
+            renderTableCode();
+        }
+
+        function addTableCell() {
+            if(tableData.length === 0) return;
+            tableData[tableData.length - 1].push('td');
+            renderVisualTable();
+            renderTableCode();
+        }
+
+        function resetTable() {
+            tableData = [];
+            renderVisualTable();
+            renderTableCode();
+        }
+
+
+        // --- УРОВЕНЬ 5: Сборка Скелета ---
         const correctOrder = [
             "<html>",
             "<head>",
@@ -268,7 +441,7 @@
             shuffled.forEach(tag => {
                 const div = document.createElement('div');
                 div.className = 'tag-block';
-                div.innerText = tag; // innerText автоматически экранирует < и >
+                div.innerText = tag; 
                 div.onclick = () => moveToZone(div, tag);
                 pool.appendChild(div);
             });
@@ -279,18 +452,13 @@
             const pool = document.getElementById('pool');
 
             if (element.parentElement === pool) {
-                // Перемещаем в зону сборки
                 currentAssembly.push(tag);
-                
-                // Делаем красивые отступы для вложенных тегов
                 let indentClass = '';
                 if (tag === '<head>' || tag === '</head>' || tag === '<body>' || tag === '</body>') indentClass = 'indent-1';
                 if (tag === '<title>123</title>' || tag === '<h1>Привет!</h1>') indentClass = 'indent-2';
                 if (indentClass) element.classList.add(indentClass);
-
                 zone.appendChild(element);
             } else {
-                // Возвращаем обратно
                 element.classList.remove('indent-1', 'indent-2');
                 const index = currentAssembly.indexOf(tag);
                 if (index > -1) currentAssembly.splice(index, 1);
@@ -323,12 +491,15 @@
             }
         }
 
-        function resetGame() {
+        function resetSkeletonGame() {
             initSkeletonGame();
         }
 
-        // Инициализация при загрузке страницы
+        // Инициализация
         initSkeletonGame();
+        renderTableCode(); 
+        renderListVisuals();
+        renderListCode();
 
     </script>
 </body>
