@@ -33,21 +33,28 @@
         .robot-instance { background: #f1c40f; color: #000; padding: 10px; border-radius: 5px; font-weight: bold; font-family: monospace; font-size: 14px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0) translateY(-50px); } 100% { transform: scale(1) translateY(0); } }
 
-        /* УРОВЕНЬ 2: Таможня Pydantic */
-        .scanner-zone { display: flex; flex-direction: column; align-items: center; background: #0b0c10; padding: 20px; border-radius: 10px; border: 2px solid #e74c3c; margin-top: 20px; position: relative; }
+        /* УРОВЕНЬ 2: Зачем нужен Pydantic */
+        .comparison-zone { display: flex; flex-direction: column; align-items: center; background: #0b0c10; padding: 20px; border-radius: 10px; border: 2px solid #e74c3c; margin-top: 20px; }
         .inputs-row { display: flex; gap: 10px; margin-bottom: 20px; }
         .inputs-row input { padding: 12px; border-radius: 5px; border: 2px solid #45a29e; background: #1f2833; color: #fff; font-size: 16px; font-weight: bold; text-align: center; outline: none; }
-        .btn-scan { background: #e74c3c; color: #fff; border: none; padding: 12px 25px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-scan:hover { background: #c0392b; box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
         
-        .scanner-machine { width: 300px; height: 150px; border: 4px solid #777; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; background: #111; overflow: hidden; margin-top: 20px; }
-        .data-box { background: #66fcf1; color: #000; padding: 10px 20px; border-radius: 5px; font-family: monospace; font-weight: bold; font-size: 16px; opacity: 0; transform: translateX(-100px); transition: 0.5s; }
-        .laser { position: absolute; width: 100%; height: 5px; background: rgba(255, 0, 0, 0.8); top: -10px; box-shadow: 0 0 10px red; display: none; z-index: 10; }
+        .btn-row { display: flex; gap: 15px; margin-bottom: 30px; width: 100%; justify-content: center; }
+        .btn-python { background: #f39c12; color: #000; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-pydantic { background: #2ecc71; color: #000; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-python:hover, .btn-pydantic:hover { transform: scale(1.05); }
+
+        .server-track { display: flex; align-items: center; justify-content: space-between; background: #111; width: 90%; height: 120px; border-radius: 10px; padding: 10px 30px; position: relative; }
         
-        @keyframes scanAnim { 0% { top: 0; } 50% { top: 145px; } 100% { top: 0; } }
+        .data-package { background: #fff; color: #000; padding: 10px 15px; border-radius: 5px; font-family: monospace; font-weight: bold; position: absolute; left: 20px; transition: left 1.5s linear; z-index: 10; opacity: 0; }
+        
+        .inspector { font-size: 50px; position: absolute; left: 45%; z-index: 5; opacity: 0.3; transition: 0.3s;}
+        .inspector.active { opacity: 1; transform: scale(1.2); }
+        
+        .server-box { background: #34495e; border: 4px solid #7f8c8d; padding: 20px; border-radius: 10px; font-weight: bold; width: 200px; z-index: 5; transition: 0.3s; position: absolute; right: 20px;}
+        .server-box.exploded { background: #e74c3c; border-color: #c0392b; animation: shakeAlert 0.4s; }
+        
         @keyframes shakeAlert { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-5deg); } 75% { transform: translateX(10px) rotate(5deg); } }
-        
-        .scan-result { margin-top: 15px; font-size: 20px; font-weight: bold; min-height: 30px; }
+        .result-text { margin-top: 20px; font-size: 18px; font-weight: bold; min-height: 50px; }
 
         /* УРОВЕНЬ 3: Код */
         .code-workspace { display: flex; gap: 20px; text-align: left; }
@@ -73,14 +80,14 @@
     <div class="game-container">
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab(1)">1. Завод (Class)</button>
-            <button class="tab-btn" onclick="openTab(2)">2. Сканер Pydantic</button>
+            <button class="tab-btn" onclick="openTab(2)">2. ЗАЧЕМ нужен Pydantic?</button>
             <button class="tab-btn" onclick="openTab(3)">3. Сборка Кода</button>
         </div>
 
         <!-- УРОВЕНЬ 1: 3D Принтер -->
         <div id="tab1" class="level-content active">
             <div class="instruction">⚡ ЗАДАЧА: Напечатай 5 роботов из одного чертежа!</div>
-            <p style="color: #aaa; margin-bottom: 20px;">Класс — это просто инструкция. Из одного класса можно сделать сколько угодно объектов[cite: 7].</p>
+            <p style="color: #aaa; margin-bottom: 20px;">Класс — это просто инструкция. Из одного класса можно сделать сколько угодно объектов.</p>
             
             <div class="factory-zone">
                 <div class="blueprint-panel">
@@ -94,30 +101,35 @@
                 
                 <button class="btn-print" onclick="printRobot()">🖨️ ПЕЧАТАТЬ<br>Robot()</button>
                 
-                <div class="conveyor-belt" id="conveyor">
-                    <!-- Роботы падают сюда -->
-                </div>
+                <div class="conveyor-belt" id="conveyor"></div>
             </div>
         </div>
 
-        <!-- УРОВЕНЬ 2: Таможня Pydantic -->
+        <!-- УРОВЕНЬ 2: Зачем нужен Pydantic -->
         <div id="tab2" class="level-content">
-            <div class="instruction">⚡ ЗАДАЧА: Попробуй обмануть Таможню Pydantic!</div>
-            <p style="color: #aaa; margin-bottom: 20px;">Инспектор проверяет посылки. Если в поле "Возраст (int)" лежит текст, посылка будет уничтожена[cite: 7]!</p>
+            <div class="instruction">⚡ ЗАДАЧА: Спаси сервер от взрыва!</div>
+            <p style="color: #aaa; margin-bottom: 20px;">Обычный Python разрешает класть текст в переменные для чисел. Из-за этого при вычислениях сервер ломается!<br>Pydantic работает как таможня: он блокирует плохие данные ДО того, как они попадут на сервер.</p>
             
-            <div class="scanner-zone" id="scannerZone">
+            <div class="comparison-zone">
                 <div class="inputs-row">
-                    <input type="text" id="catName" placeholder="Имя кота" value="Барсик">
-                    <input type="text" id="catAge" placeholder="Введи текст (напр. 'пять')">
-                </div>
-                <button class="btn-scan" onclick="startScan()">🔍 Сканировать посылку</button>
-                
-                <div class="scanner-machine" id="scannerMachine">
-                    <div class="laser" id="laserBeam"></div>
-                    <div class="data-box" id="dataBox">📦 Данные</div>
+                    <input type="text" id="catName" placeholder="Имя" value="Барсик">
+                    <input type="text" id="catAge" placeholder="Возраст (Введи слово: ПЯТЬ)" value="Пять">
                 </div>
                 
-                <div class="scan-result" id="scanRes"></div>
+                <div class="btn-row">
+                    <button class="btn-python" onclick="sendData('python')">Отправить через обычный Python 🐍</button>
+                    <button class="btn-pydantic" onclick="sendData('pydantic')">Отправить через броню Pydantic 🛡️</button>
+                </div>
+                
+                <div class="server-track">
+                    <div class="data-package" id="pkg">📦 Данные</div>
+                    <div class="inspector" id="pydanticGuard">🛡️</div>
+                    <div class="server-box" id="server">
+                        СЕРВЕР<br><span style="font-size: 12px; font-weight: normal;">Считаем год рождения:<br>2026 - Возраст</span>
+                    </div>
+                </div>
+                
+                <div class="result-text" id="simResult"></div>
             </div>
         </div>
 
@@ -159,82 +171,86 @@
             botCount++;
             const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
             const color = colors[Math.floor(Math.random() * colors.length)];
-            
             const belt = document.getElementById('conveyor');
             const bot = document.createElement('div');
             bot.className = 'robot-instance';
             bot.style.backgroundColor = color;
             bot.innerText = `🤖 Робот-${botCount}`;
-            
             belt.appendChild(bot);
         }
 
-        // --- УРОВЕНЬ 2: Таможня Pydantic ---
-        let isScanning = false;
-        function startScan() {
-            if(isScanning) return;
-            isScanning = true;
+        // --- УРОВЕНЬ 2: Зачем нужен Pydantic ---
+        let isSimulating = false;
+        function sendData(mode) {
+            if(isSimulating) return;
+            isSimulating = true;
             
             const ageInput = document.getElementById('catAge').value;
-            const nameInput = document.getElementById('catName').value;
-            const box = document.getElementById('dataBox');
-            const laser = document.getElementById('laserBeam');
-            const res = document.getElementById('scanRes');
-            const machine = document.getElementById('scannerMachine');
-            const zone = document.getElementById('scannerZone');
+            const pkg = document.getElementById('pkg');
+            const server = document.getElementById('server');
+            const guard = document.getElementById('pydanticGuard');
+            const res = document.getElementById('simResult');
             
-            // Сброс
+            // Сброс сцены
             res.innerHTML = "";
-            machine.style.borderColor = "#777";
-            zone.style.animation = "";
-            
-            // Посылка выезжает
-            box.style.opacity = "1";
-            box.style.transform = "translateX(0)";
-            box.innerText = `📦 {name:"${nameInput}", age:"${ageInput}"}`;
-            
+            server.className = "server-box";
+            server.innerHTML = "СЕРВЕР<br><span style='font-size: 12px; font-weight: normal;'>Считаем год рождения:<br>2026 - Возраст</span>";
+            pkg.style.transition = "none";
+            pkg.style.left = "20px";
+            pkg.style.opacity = "1";
+            pkg.innerText = `📦 Возраст: "${ageInput}"`;
+            guard.className = "inspector";
+
             setTimeout(() => {
-                // Включаем лазер
-                laser.style.display = "block";
-                laser.style.animation = "scanAnim 1.5s linear";
+                pkg.style.transition = "left 1.5s linear";
                 
-                setTimeout(() => {
-                    laser.style.display = "none";
-                    laser.style.animation = "";
+                if (mode === 'python') {
+                    // Обычный Python: пропускаем до конца
+                    pkg.style.left = "calc(100% - 250px)";
                     
-                    // Проверка (валидация)
-                    if(isNaN(ageInput) || ageInput.trim() === "") {
-                        // ПРОВАЛ
-                        machine.style.borderColor = "#e74c3c";
-                        box.style.background = "#e74c3c";
-                        box.style.color = "#fff";
-                        box.innerText = "💥 ОШИБКА 422!";
-                        zone.style.animation = "shakeAlert 0.4s";
-                        res.innerHTML = "<span style='color:#e74c3c;'>❌ ТРЕВОГА! В поле 'Возраст' найден текст! Посылка уничтожена!</span>";
-                        
-                        setTimeout(() => {
-                            box.style.opacity = "0";
-                            box.style.transform = "translateX(-100px)";
-                            setTimeout(() => box.style.background = "#66fcf1", 500);
-                            isScanning = false;
-                        }, 2000);
-                        
-                    } else {
-                        // УСПЕХ
-                        machine.style.borderColor = "#2ecc71";
-                        res.innerHTML = "<span style='color:#2ecc71;'>✅ ПРОВЕРКА ПРОЙДЕНА! Возраст — это число.</span>";
-                        
-                        // Посылка уезжает дальше
-                        box.style.transform = "translateX(150px)";
-                        box.style.opacity = "0";
-                        
-                        setTimeout(() => {
-                            box.style.transform = "translateX(-100px)";
-                            isScanning = false;
-                        }, 1000);
-                    }
-                }, 1500); // время сканирования
-            }, 500); // время выезда коробки
+                    setTimeout(() => {
+                        pkg.style.opacity = "0";
+                        if (isNaN(ageInput) || ageInput.trim() === "") {
+                            // Взрыв сервера
+                            server.className = "server-box exploded";
+                            server.innerHTML = "💥 БАБАХ!<br><span style='font-size: 12px;'>TypeError: unsupported operand</span>";
+                            res.innerHTML = "<span style='color:#e74c3c;'>Обычный Python пропустил текст в сервер. Сервер попытался отнять текст от числа (2026 - 'Пять') и рухнул! Из-за этого мы качаем Pydantic!</span>";
+                        } else {
+                            server.style.borderColor = "#2ecc71";
+                            res.innerHTML = "<span style='color:#2ecc71;'>Сервер выжил, потому что ты случайно ввел нормальное число. Но без защиты он уязвим!</span>";
+                        }
+                        isSimulating = false;
+                    }, 1500);
+
+                } else if (mode === 'pydantic') {
+                    // Pydantic: проверка посередине пути
+                    pkg.style.transition = "left 0.75s linear";
+                    pkg.style.left = "40%"; // Доезжаем до щита
+                    guard.className = "inspector active";
+                    
+                    setTimeout(() => {
+                        if (isNaN(ageInput) || ageInput.trim() === "") {
+                            // Pydantic блокирует
+                            pkg.style.background = "#e74c3c";
+                            pkg.style.color = "#fff";
+                            pkg.innerText = "❌ БЛОК";
+                            res.innerHTML = "<span style='color:#2ecc71;'>🛡️ Pydantic заблокировал текст на входе и выдал понятную ошибку пользователю. Сервер в полной безопасности!</span>";
+                            isSimulating = false;
+                        } else {
+                            // Pydantic пропускает и конвертирует
+                            res.innerHTML = "<span style='color:#3498db;'>✨ Магия Pydantic! Он убедился, что это число, и пропустил данные к серверу.</span>";
+                            pkg.style.transition = "left 0.75s linear";
+                            pkg.style.left = "calc(100% - 250px)";
+                            
+                            setTimeout(() => {
+                                pkg.style.opacity = "0";
+                                server.style.borderColor = "#2ecc71";
+                                isSimulating = false;
+                            }, 750);
+                        }
+                    }, 800);
+                }
+            }, 100);
         }
 
         // --- УРОВЕНЬ 3: Сборка Кода ---
