@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Мастер HTML-Разметки ⛏️</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e8f5e9; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #2e7d32; margin-bottom: 5px; text-align: center; }
+        p { color: #555; margin-bottom: 20px; text-align: center; font-size: 16px; }
+        
+        .game-container { background: white; width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        .tabs { display: flex; background-color: #81c784; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: none; cursor: pointer; transition: 0.3s; color: white; border-bottom: 4px solid transparent; }
+        .tab-btn.active { background-color: #4caf50; border-bottom: 4px solid #1b5e20; }
+        .tab-btn:hover { background-color: #66bb6a; }
+        
+        .level-content { display: none; padding: 30px; min-height: 400px; }
+        .level-content.active { display: block; }
+
+        /* --- УРОВЕНЬ 1: Викторина --- */
+        .quiz-card { background: #f1f8e9; border: 2px solid #81c784; border-radius: 10px; padding: 20px; text-align: center; }
+        .quiz-question { font-size: 22px; font-weight: bold; color: #1b5e20; margin-bottom: 20px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .quiz-option { background: #c8e6c9; border: none; padding: 12px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #1b5e20; transition: 0.2s; width: 80%; text-align: center; }
+        .quiz-option:hover { background: #a5d6a7; transform: scale(1.02); }
+        .quiz-feedback { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 25px; }
+
+        /* --- УРОВЕНЬ 2: Связи (Атрибуты) --- */
+        .match-container { display: flex; justify-content: space-around; margin-top: 20px; }
+        .match-column { display: flex; flex-direction: column; gap: 15px; width: 40%; }
+        .match-btn { background: #fff9c4; border: 2px solid #fbc02d; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .match-btn.selected { background: #fff59d; box-shadow: 0 0 10px #fbc02d; transform: scale(1.05); }
+        .match-btn.matched { background: #c8e6c9; border-color: #388e3c; color: #1b5e20; cursor: default; opacity: 0.8; }
+        .match-btn.error { background: #ffcdd2; border-color: #d32f2f; }
+
+        /* --- УРОВЕНЬ 3: Сборка Таблицы --- */
+        .code-builder { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 10px; font-family: monospace; font-size: 18px; line-height: 1.6; }
+        .code-builder select { font-family: monospace; font-size: 16px; padding: 5px; border-radius: 5px; background: #e0e0e0; border: none; outline: none; font-weight: bold; color: #d32f2f; }
+        .html-tag { color: #e06c75; }
+        .html-attr { color: #d19a66; }
+        .html-val { color: #98c379; }
+        .builder-btn { background: #4caf50; color: white; border: none; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 100%; }
+        .builder-btn:hover { background: #388e3c; }
+
+    </style>
+</head>
+<body>
+
+    <h1>⛏️ Мастер HTML-Разметки: Урок 2 ⛏️</h1>
+    <p>Собери свою страницу про мобов, как собираешь блоки в игре!</p>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openLevel(1)">1. Тест на Крафтера</button>
+            <button class="tab-btn" onclick="openLevel(2)">2. Соедини Атрибуты</button>
+            <button class="tab-btn" onclick="openLevel(3)">3. Крафт Таблицы</button>
+        </div>
+
+        <!-- УРОВЕНЬ 1: Викторина -->
+        <div id="level1" class="level-content active">
+            <div class="quiz-card">
+                <div class="quiz-question" id="q-text">Вопрос загружается...</div>
+                <div class="quiz-options" id="q-options"></div>
+                <div class="quiz-feedback" id="q-feedback"></div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Соедини Атрибуты -->
+        <div id="level2" class="level-content">
+            <h2 style="text-align:center; color: #2e7d32; margin-top:0;">Какой атрибут нужен тегу?</h2>
+            <p style="text-align:center;">Кликни на тег слева, а затем на его помощника справа!</p>
+            <div class="match-container">
+                <div class="match-column" id="tags-col">
+                    <button class="match-btn" id="tag1" onclick="selectItem('tag1', 'img')">&lt;img&gt; (Картинка)</button>
+                    <button class="match-btn" id="tag2" onclick="selectItem('tag2', 'a')">&lt;a&gt; (Ссылка)</button>
+                    <button class="match-btn" id="tag3" onclick="selectItem('tag3', 'table')">&lt;table&gt; (Таблица)</button>
+                </div>
+                <div class="match-column" id="attrs-col">
+                    <button class="match-btn" id="attr1" onclick="selectItem('attr1', 'a')">href="..."</button>
+                    <button class="match-btn" id="attr2" onclick="selectItem('attr2', 'table')">border="1"</button>
+                    <button class="match-btn" id="attr3" onclick="selectItem('attr3', 'img')">src="..."</button>
+                </div>
+            </div>
+            <div id="match-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:20px; min-height: 25px;"></div>
+        </div>
+
+        <!-- УРОВЕНЬ 3: Сборка Таблицы -->
+        <div id="level3" class="level-content">
+            <h2 style="text-align:center; color: #2e7d32; margin-top:0;">Скрафти таблицу мобов!</h2>
+            <p style="text-align:center;">Заполни пропуски правильными тегами, чтобы зомби и криперы появились на сайте.</p>
+            
+            <div class="code-builder">
+                <span class="html-tag">&lt;table</span> <span class="html-attr">border</span>=<span class="html-val">"1"</span><span class="html-tag">&gt;</span><br>
+                &nbsp;&nbsp;<select id="sel1"><option value="0">...</option><option value="tr">&lt;tr&gt;</option><option value="td">&lt;td&gt;</option><option value="ul">&lt;ul&gt;</option></select><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="html-tag">&lt;td&gt;</span>Зомби<span class="html-tag">&lt;/td&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<select id="sel2"><option value="0">...</option><option value="td">&lt;td&gt;</option><option value="a">&lt;a&gt;</option><option value="tr">&lt;tr&gt;</option></select>Горит на солнце<span class="html-tag">&lt;/td&gt;</span><br>
+                &nbsp;&nbsp;<span class="html-tag">&lt;/tr&gt;</span><br>
+                &nbsp;&nbsp;<span class="html-tag">&lt;tr&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="html-tag">&lt;td&gt;</span>Крипер<span class="html-tag">&lt;/td&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="html-tag">&lt;td&gt;</span>Взрывается<span class="html-tag">&lt;/td&gt;</span><br>
+                &nbsp;&nbsp;<select id="sel3"><option value="0">...</option><option value="table">&lt;/table&gt;</option><option value="tr">&lt;/tr&gt;</option><option value="td">&lt;/td&gt;</option></select><br>
+                <span class="html-tag">&lt;/table&gt;</span>
+            </div>
+            <button class="builder-btn" onclick="checkTable()">Проверить код!</button>
+            <div id="table-feedback" style="text-align:center; font-weight:bold; font-size:18px; margin-top:15px; min-height: 25px;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function openLevel(level) {
+            document.querySelectorAll('.level-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('level' + level).classList.add('active');
+            document.querySelectorAll('.tab-btn')[level - 1].classList.add('active');
+        }
+
+        // --- УРОВЕНЬ 1: Викторина ---
+        const questions = [
+            { q: "HTML — это язык программирования?", options: ["Да, на нем пишут сложную логику", "Нет, это язык разметки (каркас сайта)"], a: 1 },
+            { q: "В чем разница между списками <ol> и <ul>?", options: ["<ol> — нумерованный (1, 2, 3), <ul> — маркированный (точки)", "<ol> — для текста, <ul> — для картинок"], a: 0 },
+            { q: "Какой тег создает отдельную ячейку (столбец) внутри таблицы?", options: ["<tr>", "<td>", "<table>"], a: 1 },
+            { q: "Как правильно связать страницу index.html с mob.html?", options: ["<a href=\"mob.html\">Мобы</a>", "<link src=\"mob.html\">"], a: 0 },
+            { q: "Как быстро открыть готовую HTML-страницу из VS Code в браузере?", options: ["Нажать правую кнопку мыши по файлу -> Copy Path (и вставить в браузер)", "Написать в коде команду OPEN"], a: 0 }
+        ];
+        let currentQ = 0;
+
+        function loadQuestion() {
+            if(currentQ >= questions.length) {
+                document.getElementById('q-text').innerText = "🎉 Все вопросы пройдены! Переходи к следующему уровню.";
+                document.getElementById('q-options').innerHTML = "";
+                return;
+            }
+            const q = questions[currentQ];
+            document.getElementById('q-text').innerText = q.q;
+            let html = '';
+            q.options.forEach((opt, index) => {
+                html += `<button class="quiz-option" onclick="checkAnswer(${index})">${opt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</button>`;
+            });
+            document.getElementById('q-options').innerHTML = html;
+            document.getElementById('q-feedback').innerText = "";
+        }
+
+        function checkAnswer(index) {
+            if(index === questions[currentQ].a) {
+                document.getElementById('q-feedback').style.color = "green";
+                document.getElementById('q-feedback').innerText = "✅ Верно!";
+                currentQ++;
+                setTimeout(loadQuestion, 1200);
+            } else {
+                document.getElementById('q-feedback').style.color = "red";
+                document.getElementById('q-feedback').innerText = "❌ Ошибка! Подумай еще.";
+            }
+        }
+        loadQuestion();
+
+        // --- УРОВЕНЬ 2: Соедини Атрибуты ---
+        let selectedTag = null;
+        let selectedAttr = null;
+
+        function selectItem(id, typeMatch) {
+            const btn = document.getElementById(id);
+            if(btn.classList.contains('matched')) return;
+
+            // Если кликнули по левой колонке (теги)
+            if(id.startsWith('tag')) {
+                if(selectedTag) document.getElementById(selectedTag.id).classList.remove('selected');
+                selectedTag = { id, type: typeMatch };
+                btn.classList.add('selected');
+            } 
+            // Если кликнули по правой колонке (атрибуты)
+            else {
+                if(selectedAttr) document.getElementById(selectedAttr.id).classList.remove('selected');
+                selectedAttr = { id, type: typeMatch };
+                btn.classList.add('selected');
+            }
+
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if(selectedTag && selectedAttr) {
+                const fb = document.getElementById('match-feedback');
+                const tBtn = document.getElementById(selectedTag.id);
+                const aBtn = document.getElementById(selectedAttr.id);
+
+                if(selectedTag.type === selectedAttr.type) {
+                    fb.style.color = "green";
+                    fb.innerText = "✨ Отличное соединение!";
+                    tBtn.className = "match-btn matched";
+                    aBtn.className = "match-btn matched";
+                } else {
+                    fb.style.color = "red";
+                    fb.innerText = "❌ Этот атрибут не подходит к этому тегу!";
+                    tBtn.classList.remove('selected');
+                    aBtn.classList.remove('selected');
+                }
+                selectedTag = null;
+                selectedAttr = null;
+            }
+        }
+
+        // --- УРОВЕНЬ 3: Сборка Таблицы ---
+        function checkTable() {
+            const s1 = document.getElementById('sel1').value;
+            const s2 = document.getElementById('sel2').value;
+            const s3 = document.getElementById('sel3').value;
+            const fb = document.getElementById('table-feedback');
+
+            if(s1 === "tr" && s2 === "td" && s3 === "tr") {
+                fb.style.color = "green";
+                fb.innerText = "✅ Идеально! Таблица построена без ошибок.";
+            } else {
+                fb.style.color = "red";
+                fb.innerText = "❌ Где-то ошибка в структуре таблицы (tr - строки, td - ячейки).";
+            }
+        }
+    </script>
+</body>
+</html>
