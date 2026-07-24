@@ -21,16 +21,19 @@
         .instruction { font-size: 22px; color: #00d2ff; font-weight: bold; margin-bottom: 20px; }
 
         /* УРОВЕНЬ 1: Упаковка */
+        .task-board { background: #333; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #4CAF50; }
+        .score-board { font-size: 24px; color: #f9a826; font-weight: bold; margin-bottom: 10px; }
         .factory-zone { display: flex; gap: 20px; justify-content: center; align-items: center; }
-        .control-panel { background: #333; padding: 20px; border-radius: 10px; border: 2px dashed #f9a826; }
+        .control-panel { background: #333; padding: 20px; border-radius: 10px; border: 2px dashed #f9a826; width: 300px; }
         .control-panel input { display: block; width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; font-size: 16px; font-family: monospace; }
-        .btn-pack { background: #f9a826; color: #000; font-weight: bold; font-size: 18px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; }
-        .btn-pack:hover { transform: scale(1.1); }
+        .btn-pack { background: #f9a826; color: #000; font-weight: bold; font-size: 18px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; width: 100%; }
+        .btn-pack:hover { transform: scale(1.05); }
+        .feedback-msg { margin-top: 15px; font-weight: bold; font-size: 18px; min-height: 25px; }
         
         .conveyor { width: 300px; height: 200px; background: #111; border-bottom: 10px solid #555; position: relative; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; border-radius: 10px; }
         .box-anim { width: 120px; height: 120px; background: #e94560; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: -150px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: inset 0 -15px 0 rgba(0,0,0,0.3); }
         .box-anim .lbl { background: #fff; color: #000; padding: 2px 8px; font-weight: bold; font-family: monospace; font-size: 14px; border-radius: 3px; position: absolute; top: 10px; }
-        .box-anim .val { font-size: 35px; margin-top: 15px; }
+        .box-anim .val { font-size: 35px; margin-top: 15px; font-weight: bold; }
 
         /* УРОВЕНЬ 2: Сортировка */
         .sort-game { display: flex; flex-direction: column; align-items: center; gap: 20px; }
@@ -83,12 +86,19 @@
 
         <!-- УРОВЕНЬ 1 -->
         <div id="tab1" class="level-content active">
-            <div class="instruction">⚡ ЗАДАЧА: Создай умный блок с данными!</div>
+            <div class="instruction">⚡ ЗАДАЧА: Выполняй заказы на упаковку!</div>
+            
+            <div class="score-board">ОЧКИ: <span id="scoreDisplay">0</span></div>
+            <div class="task-board">
+                <div id="taskDesc" style="font-size: 20px; color: #fff;">Загрузка задания...</div>
+            </div>
+
             <div class="factory-zone">
                 <div class="control-panel">
-                    <input type="text" id="vName" placeholder="Наклейка (Имя: speed)">
-                    <input type="text" id="vVal" placeholder="Груз (Значение: 100)">
-                    <button class="btn-pack" onclick="dropBox()">⬇️ Сбросить коробку!</button>
+                    <input type="text" id="vName" placeholder="Имя переменной">
+                    <input type="text" id="vVal" placeholder="Значение">
+                    <button class="btn-pack" onclick="dropBox()">⬇️ Упаковать!</button>
+                    <div id="feedbackMsg" class="feedback-msg"></div>
                 </div>
                 <div class="conveyor">
                     <div class="box-anim" id="theBox">
@@ -97,7 +107,7 @@
                     </div>
                 </div>
             </div>
-            <p style="color: #888; margin-top: 15px;">Переменная — это просто коробка с наклейкой (Имя), внутри которой лежит значение[cite: 5].</p>
+            <p style="color: #888; margin-top: 15px;">Переменная — это коробка с наклейкой (Имя), внутри которой лежит значение.</p>
         </div>
 
         <!-- УРОВЕНЬ 2 -->
@@ -124,7 +134,7 @@
         <!-- УРОВЕНЬ 3 -->
         <div id="tab3" class="level-content">
             <div class="instruction">⚡ ЗАДАЧА: Брось гирю 999999 в обе коробки!</div>
-            <p style="color: #aaa; margin-bottom: 30px;">Проверь, как работает память в Python по сравнению с другими языками[cite: 5].</p>
+            <p style="color: #aaa; margin-bottom: 30px;">Проверь, как работает память в Python по сравнению с другими языками.</p>
             
             <div class="crash-zone">
                 <div class="test-box c-box" id="cBox">
@@ -170,23 +180,78 @@
             document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
         }
 
-        // УРОВЕНЬ 1
-        function dropBox() {
-            let n = document.getElementById('vName').value || "speed";
-            let v = document.getElementById('vVal').value || "100";
-            let box = document.getElementById('theBox');
-            
-            // Поднимаем вверх
-            box.style.top = "-150px";
-            
-            setTimeout(() => {
-                document.getElementById('bLbl').innerText = n;
-                document.getElementById('bVal').innerText = v;
-                box.style.top = "40px"; // Падает вниз
-            }, 300);
+        // --- УРОВЕНЬ 1: Логика заданий ---
+        let score = 0;
+        let currentTaskIndex = 0;
+        let isAnimating = false;
+
+        const tasks = [
+            { name: "a", val: "1", text: "Создай переменную 'a' со значением '1'" },
+            { name: "date", val: "'25.07.2026'", text: "Создай строковую переменную 'date' со значением '25.07.2026' (с одинарными кавычками!)" },
+            { name: "mode", val: "True", text: "Создай логическую переменную 'mode' со значением 'True' (с большой буквы)" },
+            { name: "pi_num", val: "3.14", text: "Создай дробную переменную 'pi_num' со значением '3.14'" },
+            { name: "my_char", val: "'@'", text: "Создай переменную 'my_char' со значением '@' (в кавычках)" }
+        ];
+
+        function loadNextTask() {
+            const descEl = document.getElementById('taskDesc');
+            if (currentTaskIndex < tasks.length) {
+                descEl.innerText = `Заказ #${currentTaskIndex + 1}: ${tasks[currentTaskIndex].text}`;
+            } else {
+                descEl.innerText = "🎉 Все заказы успешно выполнены! Ты настоящий мастер переменных!";
+                descEl.style.color = "#f9a826";
+            }
+            // Очищаем поля ввода
+            document.getElementById('vName').value = "";
+            document.getElementById('vVal').value = "";
+            document.getElementById('feedbackMsg').innerText = "";
         }
 
-        // Общий Drag & Drop
+        function dropBox() {
+            if (currentTaskIndex >= tasks.length || isAnimating) return;
+            isAnimating = true;
+
+            let nInput = document.getElementById('vName').value.trim();
+            let vInput = document.getElementById('vVal').value.trim();
+            let box = document.getElementById('theBox');
+            let fbMsg = document.getElementById('feedbackMsg');
+            
+            // Поднимаем вверх (типа конвейер привез новую коробку)
+            box.style.transition = "0s";
+            box.style.top = "-150px";
+            
+            // Ждем долю секунды и запускаем падение
+            setTimeout(() => {
+                box.style.transition = "0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                document.getElementById('bLbl').innerText = nInput || "пусто";
+                document.getElementById('bVal').innerText = vInput || "❓";
+                box.style.top = "40px"; // Падает вниз
+
+                // Проверка ответа
+                let currentTarget = tasks[currentTaskIndex];
+                if (nInput === currentTarget.name && vInput === currentTarget.val) {
+                    score++;
+                    fbMsg.innerText = "✅ Верно! +1 очко";
+                    fbMsg.style.color = "#4CAF50";
+                    currentTaskIndex++;
+                    setTimeout(() => {
+                        loadNextTask();
+                        isAnimating = false;
+                    }, 1500);
+                } else {
+                    score--;
+                    fbMsg.innerText = "❌ Ошибка! Проверь имя, значение или кавычки. -1 очко";
+                    fbMsg.style.color = "#e53935";
+                    isAnimating = false;
+                }
+                document.getElementById('scoreDisplay').innerText = score;
+            }, 100);
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadNextTask);
+
+        // --- Общий Drag & Drop ---
         let draggedItem = null;
         document.addEventListener('dragstart', e => { if(e.target.draggable) draggedItem = e.target; });
 
@@ -221,12 +286,12 @@
                     if(lang === 'c') {
                         document.getElementById('cBox').classList.add('broken');
                         document.getElementById('cBox').innerHTML = "💥 БАБАХ!";
-                        msg.innerText = "Ошибка переполнения памяти! Жесткая коробка порвалась[cite: 5].";
+                        msg.innerText = "Ошибка переполнения памяти! Жесткая коробка порвалась.";
                         msg.style.color = "#e53935";
                     } else if (lang === 'py') {
                         document.getElementById('pyBox').classList.add('stretched');
                         document.getElementById('pyBox').innerHTML = "📦 Эластично!";
-                        msg.innerText = "Магия Python! Коробка сама растянулась под размер числа[cite: 5].";
+                        msg.innerText = "Магия Python! Коробка сама растянулась под размер числа.";
                         msg.style.color = "#4CAF50";
                     }
                 }
