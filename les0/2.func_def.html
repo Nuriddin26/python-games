@@ -18,24 +18,35 @@
         .level-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        .instruction { font-size: 22px; color: #45a29e; font-weight: bold; margin-bottom: 20px; }
+        .instruction { font-size: 22px; color: #45a29e; font-weight: bold; margin-bottom: 10px; }
 
-        /* УРОВЕНЬ 1: Станки (Вход / Выход) */
-        .machines-row { display: flex; gap: 15px; justify-content: center; align-items: stretch; margin-top: 20px; }
+        /* УРОВЕНЬ 1: Сила функций (Анти-Мусор) */
+        .power-layout { display: flex; gap: 15px; text-align: left; margin-top: 15px; align-items: stretch; }
+        .bad-side, .good-side { flex: 1; background: #1a2028; padding: 20px; border-radius: 10px; border: 2px solid #45a29e; display: flex; flex-direction: column; }
+        .bad-side { border-color: #e74c3c; }
+        .good-side { border-color: #66fcf1; opacity: 0.3; pointer-events: none; transition: 0.5s; }
+        .good-side.unlocked { opacity: 1; pointer-events: auto; box-shadow: 0 0 15px rgba(102, 252, 241, 0.2); }
+        
+        .code-title { margin-top: 0; margin-bottom: 5px; font-size: 20px; }
+        .code-desc { font-size: 13px; color: #aaa; margin-bottom: 15px; min-height: 35px;}
+        
+        .scroll-code { flex: 1; background: #0b0c10; padding: 10px; font-family: monospace; font-size: 12px; color: #e74c3c; border: 1px solid #e74c3c; border-radius: 5px; overflow-y: auto; height: 180px; }
+        .neat-code { background: #0b0c10; padding: 15px; font-family: monospace; font-size: 16px; border: 1px dashed #66fcf1; border-radius: 5px; color: #fff; margin-bottom: 10px;}
+        .func-editor { flex: 1; background: #0b0c10; padding: 10px; font-family: monospace; font-size: 16px; color: #66fcf1; border: 1px solid #66fcf1; border-radius: 5px; height: 100px; display: flex; flex-direction: column; justify-content: flex-end; }
+        
+        .arrow-btn { background: #f9a826; color: #000; font-weight: bold; border: none; padding: 15px; border-radius: 10px; cursor: pointer; align-self: center; font-size: 16px; box-shadow: 0 5px 0 #d35400; transition: 0.2s; }
+        .arrow-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #d35400; }
+        
+        .conveyor-belt { margin-top: 20px; background: #111; border-bottom: 8px solid #333; height: 70px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; gap: 15px; overflow: hidden; padding-bottom: 5px;}
+        .robot-item { font-size: 50px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* УРОВЕНЬ 1: Станки */
+        .machines-row { display: flex; gap: 15px; justify-content: center; align-items: stretch; margin-top: 15px; }
         .machine { flex: 1; background: #0b0c10; padding: 20px; border-radius: 10px; border: 2px dashed #45a29e; display: flex; flex-direction: column; align-items: center; position: relative; }
         .machine h3 { color: #66fcf1; margin-top: 0; font-family: monospace; font-size: 18px; }
         
         .m-stage { min-height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; width: 100%; border-radius: 8px; background: #1a2028; position: relative; overflow: hidden; padding: 5px; box-sizing: border-box;}
         .emoji-large { font-size: 60px; transition: 0.3s; z-index: 2; }
-        
-        /* Экран со скрытым кодом для Станка 1 */
-        .hidden-code-box { font-family: monospace; font-size: 11px; color: #777; text-align: left; background: #0b0c10; padding: 10px; border-radius: 5px; width: 100%; border: 1px solid #1f2833; }
-        .hidden-code-box span { padding: 2px 4px; border-radius: 3px; transition: 0.1s; display: inline-block; width: 100%; box-sizing: border-box; }
-        
-        /* Кнопки и Драг-элементы */
-        .btn-action { background: #45a29e; color: #000; font-weight: bold; font-size: 16px; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; width: 100%; margin-bottom: 10px;}
-        .btn-action:hover { background: #66fcf1; transform: scale(1.05); }
-        .btn-action:active { transform: scale(0.95); }
         
         .draggables { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
         .drag-item { width: 40px; height: 40px; border-radius: 50%; cursor: grab; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.5); user-select: none; }
@@ -47,7 +58,13 @@
         .drop-slot { border: 2px dashed #777; width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: absolute; }
         .drop-slot.dragover { border-color: #66fcf1; background: rgba(102, 252, 241, 0.1); }
         
-        .output-box { background: #66fcf1; color: #000; padding: 5px 10px; font-weight: bold; border-radius: 5px; font-family: monospace; position: absolute; right: -150px; transition: 0.5s; }
+        .output-box { background: #66fcf1; color: #000; padding: 5px 10px; font-weight: bold; border-radius: 5px; font-family: monospace; position: absolute; right: -150px; transition: 0.5s; z-index: 3;}
+
+        /* Кнопки */
+        .btn-action { color: #000; font-weight: bold; font-size: 16px; padding: 12px 15px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 15px;}
+        .btn-action:hover { transform: scale(1.02); }
+        .btn-action:active { transform: scale(0.98); }
+        .c-kw { color: #c678dd; } .c-func { color: #61afef; } .c-str { color: #98c379; }
 
         /* УРОВЕНЬ 2: Кофемашина (Default) */
         .coffee-zone { display: flex; justify-content: space-around; align-items: center; background: #0b0c10; padding: 30px; border-radius: 10px; border: 2px solid #45a29e; margin-top: 20px; }
@@ -55,8 +72,6 @@
         .coffee-input { padding: 12px; border-radius: 5px; border: none; font-size: 16px; font-family: monospace; text-align: center; }
         .coffee-machine-vis { font-size: 100px; position: relative; }
         .coffee-msg { font-size: 20px; font-weight: bold; color: #66fcf1; margin-top: 20px; min-height: 30px; }
-        
-        /* Динамические кусочки сахара */
         .sugar-cube-anim { position: absolute; font-size: 25px; top: -50px; animation: fallInCup 0.6s forwards; z-index: 10; }
         @keyframes fallInCup {
             0% { top: -60px; opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
@@ -70,7 +85,6 @@
         .palette-code h3, .editor-code h3 { color: #45a29e; margin-top: 0; text-align: center; }
         .code-block { background: #1f2833; border-left: 5px solid #66fcf1; padding: 15px; margin: 10px 0; border-radius: 5px; cursor: grab; font-family: monospace; color: #c5c6c7; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .code-block:active { cursor: grabbing; }
-        .c-kw { color: #c678dd; } .c-func { color: #61afef; }
         
         .drop-zone-code { background: #111; border: 2px dashed #45a29e; height: 50px; margin: 10px 0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 14px; transition: 0.2s; }
         .drop-zone-code.dragover { border-color: #66fcf1; background: rgba(102,252,241,0.1); }
@@ -81,7 +95,7 @@
         .res-msg { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-weight: bold; font-size: 18px; }
         
         /* Анимации */
-        @keyframes explode { 0% { transform: scale(0.5); opacity: 1; } 50% { transform: scale(2); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
+        @keyframes popIn { 0% { transform: scale(0.1); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
     </style>
 </head>
@@ -91,34 +105,64 @@
 
     <div class="game-container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab(1)">1. Станки (Вход / Выход)</button>
+            <button class="tab-btn active" onclick="switchTab(1)">1. Фабрика (Сила + Аргументы)</button>
             <button class="tab-btn" onclick="switchTab(2)">2. Кофемашина (Default)</button>
             <button class="tab-btn" onclick="switchTab(3)">3. Сборка Кода</button>
         </div>
 
-        <!-- УРОВЕНЬ 1: Станки -->
+        <!-- УРОВЕНЬ 1: Сила функций и Станки -->
         <div id="tab1" class="level-content active">
-            <div class="instruction">⚡ ЗАДАЧА: Узнай, как функция прячет код и возвращает данные!</div>
             
-            <div class="machines-row">
-                <!-- Станок 1 -->
-                <div class="machine">
-                    <h3>def boom():</h3>
-                    <div class="m-stage">
-                        <div class="hidden-code-box" id="boomCode">
-                            <span>> engine.start()</span><br>
-                            <span>> fuel.pump(100)</span><br>
-                            <span>> system.unlock()</span><br>
-                            <span>> countdown(3)</span><br>
-                            <span>> ignite()</span>
-                        </div>
-                        <div class="emoji-large" id="firework" style="display:none; position:absolute;">🎇</div>
+            <div class="instruction">⚡ ЗАДАЧА 1: Спаси код от мусора! Пойми силу функций!</div>
+            <p style="color: #aaa; margin: 0;">Смотри, сколько команд нужно написать, чтобы собрать <b>всего одного</b> робота!</p>
+
+            <div class="power-layout">
+                <!-- Без функций -->
+                <div class="bad-side">
+                    <h3 class="code-title" style="color: #e74c3c;">Без функций (Копипаст)</h3>
+                    <div class="code-desc">Если нам нужно 3 робота, придется дублировать весь этот код 3 раза!</div>
+                    <div class="scroll-code" id="longCode">
+                        print(<span class="c-str">"Взять металл"</span>)<br>
+                        print(<span class="c-str">"Сварить каркас"</span>)<br>
+                        print(<span class="c-str">"Собрать гусеницы"</span>)<br>
+                        print(<span class="c-str">"Установить плату"</span>)<br>
+                        print(<span class="c-str">"Припаять провода"</span>)<br>
+                        print(<span class="c-str">"Поставить сенсоры"</span>)<br>
+                        print(<span class="c-str">"Загрузить ИИ"</span>)<br>
+                        print(<span class="c-str">"Проверить питание"</span>)<br>
+                        print(<span class="c-str">"РОБОТ ГОТОВ!"</span>)
                     </div>
-                    <button class="btn-action" onclick="runBoom()">ВЫЗВАТЬ boom()</button>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Смотри! Вызов всего в 1 строку по очереди запускает огромный скрытый код!</p>
+                    <button class="btn-action" style="background:#e74c3c; color:white;" onclick="duplicateBadCode()">Собрать 3 роботов (Скопировать код)</button>
                 </div>
 
-                <!-- Станок 2 -->
+                <!-- Кнопка упаковки -->
+                <button class="arrow-btn" id="packBtn" onclick="compressCode()">
+                    СЖАТЬ<br>В ФУНКЦИЮ<br>▶▶▶
+                </button>
+
+                <!-- С функциями -->
+                <div class="good-side" id="goodSide">
+                    <h3 class="code-title" style="color: #66fcf1;">С функцией (Магия!)</h3>
+                    <div class="code-desc">Мы спрятали всю рутину в одну функцию. Нам не нужно писать шаги заново!</div>
+                    <div class="neat-code">
+                        <span class="c-kw">def</span> <span class="c-func">build_robot</span>():<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#777;"># 100 строк кода надежно спрятаны здесь!</span>
+                    </div>
+                    <div class="func-editor" id="funcEditor"></div>
+                    <button class="btn-action" style="background:#66fcf1;" onclick="callFunction()">Собрать робота: build_robot()</button>
+                </div>
+            </div>
+            
+            <div class="conveyor-belt" id="robotConveyor"></div>
+            <div id="funcMsg" style="margin-top:15px; font-weight:bold; font-size:18px; color: #f9a826; min-height: 25px;"></div>
+
+            <hr style="border: 1px solid #1f2833; margin: 30px 0;">
+
+            <div class="instruction">⚡ ЗАДАЧА 2: Узнай, как функции работают с данными (Аргументы и Return)</div>
+            <p style="color: #aaa; margin: 0 0 15px 0;">Перетащи данные в станки и посмотри, что они сделают.</p>
+
+            <div class="machines-row">
+                <!-- Станок: paint -->
                 <div class="machine">
                     <h3>def paint(color):</h3>
                     <div class="m-stage">
@@ -129,10 +173,10 @@
                         <div class="drag-item color-red" draggable="true" data-val="red" ondragstart="drag(event)"></div>
                         <div class="drag-item color-blue" draggable="true" data-val="blue" ondragstart="drag(event)"></div>
                     </div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Просит краску (Аргумент). Красит, но обратно ничего не отдает.</p>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Просит краску (Аргумент). Красит машину, но обратно нам ничего не отдает.</p>
                 </div>
 
-                <!-- Станок 3 -->
+                <!-- Станок: double -->
                 <div class="machine">
                     <h3>def double(num):<br><span style="color:#c678dd">return</span> num*2</h3>
                     <div class="m-stage">
@@ -144,15 +188,16 @@
                         <div class="drag-item num-block" draggable="true" data-val="5" ondragstart="drag(event)">5</div>
                         <div class="drag-item num-block" draggable="true" data-val="8" ondragstart="drag(event)">8</div>
                     </div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Просит число и <b>ВОЗВРАЩАЕТ (return)</b> новое число обратно нам!</p>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Просит число и <b>ВОЗВРАЩАЕТ (return)</b> переработанное значение обратно нам!</p>
                 </div>
             </div>
+
         </div>
 
         <!-- УРОВЕНЬ 2: Кофемашина -->
         <div id="tab2" class="level-content">
             <div class="instruction">⚡ ЗАДАЧА: Завари кофе с помощью значений по умолчанию!</div>
-            <p style="color: #aaa;">Если мы не скажем функции <code>make_coffee(sugar=0)</code>, сколько нужно сахара, она не сломается, а использует значение по умолчанию (0)[cite: 6].</p>
+            <p style="color: #aaa;">Если мы не скажем функции <code>make_coffee(sugar=0)</code>, сколько нужно сахара, она не сломается, а использует значение по умолчанию (0).</p>
             
             <div class="coffee-zone">
                 <div class="coffee-controls">
@@ -170,7 +215,7 @@
 
         <!-- УРОВЕНЬ 3: Сборка -->
         <div id="tab3" class="level-content">
-            <div class="instruction">⚡ ЗАДАЧА: Собери функцию, которая ВЕРНЕТ робота!</div>
+            <div class="instruction">⚡ ЗАДАЧА: Собери функцию, которая ВЕРНЕТ сообщение!</div>
             <div class="code-workspace">
                 <div class="palette-code" id="codePal">
                     <h3>Детали кода</h3>
@@ -191,7 +236,6 @@
     </div>
 
     <script>
-        function openTab(n) { switchTab(n); }
         function switchTab(n) {
             document.querySelectorAll('.level-content').forEach(e => e.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
@@ -199,47 +243,69 @@
             document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
         }
 
-        // --- УРОВЕНЬ 1: Станки ---
-        let isBooming = false;
-        function runBoom() {
-            if(isBooming) return;
-            isBooming = true;
+        // --- УРОВЕНЬ 1: СИЛА ФУНКЦИЙ (Анти-Мусор) ---
+        let badCodeDuplicated = false;
+
+        function duplicateBadCode() {
+            if(badCodeDuplicated) return;
+            const codeBox = document.getElementById('longCode');
+            const originalCode = codeBox.innerHTML;
             
-            const codeLines = document.getElementById('boomCode').children;
-            const fw = document.getElementById('firework');
+            // Забиваем экран мусором
+            codeBox.innerHTML += "<br><br><span style='color:#fff;'># КОПИПАСТ ДЛЯ 2-го РОБОТА:</span><br>" + originalCode + 
+                                 "<br><br><span style='color:#fff;'># КОПИПАСТ ДЛЯ 3-го РОБОТА:</span><br>" + originalCode;
             
-            // Быстрая подсветка строк кода (имитация выполнения скрытой логики)
-            let delay = 0;
-            for(let i=0; i<codeLines.length; i++) {
-                if(codeLines[i].tagName === 'SPAN') {
-                    setTimeout(() => {
-                        codeLines[i].style.color = '#fff';
-                        codeLines[i].style.background = '#e74c3c';
-                    }, delay);
-                    delay += 150;
-                }
-            }
+            // Автоскролл вниз
+            codeBox.scrollTop = codeBox.scrollHeight;
             
-            // Взрыв после выполнения всех строк
-            setTimeout(() => {
-                fw.style.display = 'block';
-                fw.style.animation = 'explode 0.6s';
-                
-                // Сброс состояния
-                setTimeout(() => {
-                    fw.style.animation = '';
-                    fw.style.display = 'none';
-                    for(let i=0; i<codeLines.length; i++) {
-                        if(codeLines[i].tagName === 'SPAN') {
-                            codeLines[i].style.color = '';
-                            codeLines[i].style.background = '';
-                        }
-                    }
-                    isBooming = false;
-                }, 600);
-            }, delay + 100);
+            const msg = document.getElementById('funcMsg');
+            msg.innerText = "❌ Ужас! Экран забит дубликатами. В таком коде невозможно найти ошибку! Жми желтую кнопку 'Сжать'!";
+            msg.style.color = "#e74c3c";
+            
+            badCodeDuplicated = true;
         }
 
+        function compressCode() {
+            // Анимация упаковки
+            document.getElementById('packBtn').innerText = "✅ УПАКОВАНО!";
+            document.getElementById('packBtn').style.background = "#4CAF50";
+            
+            // Разблокируем правую часть
+            document.getElementById('goodSide').classList.add('unlocked');
+            
+            const msg = document.getElementById('funcMsg');
+            msg.innerText = "✨ Отлично! Весь этот мусорный код спрятан внутри функции. Вызови её 3 раза!";
+            msg.style.color = "#66fcf1";
+        }
+
+        let robotsCount = 0;
+        function callFunction() {
+            if(!document.getElementById('goodSide').classList.contains('unlocked')) return;
+            
+            if(robotsCount < 3) {
+                const editor = document.getElementById('funcEditor');
+                const conveyor = document.getElementById('robotConveyor');
+                
+                // Добавляем строчку кода
+                editor.innerHTML += "<span><span class='c-func'>build_robot</span>()</span><br>";
+                
+                // Спавним робота
+                let r = document.createElement('div');
+                r.className = 'robot-item';
+                r.innerText = '🤖';
+                conveyor.appendChild(r);
+                
+                robotsCount++;
+                
+                if (robotsCount === 3) {
+                    const msg = document.getElementById('funcMsg');
+                    msg.innerHTML = "✅ ПОБЕДА! Вместо <b>300 строк мусора</b> мы написали <b>всего 3 строчки</b>! В этом и есть главная сила функций — избавление от дублирования кода!";
+                    msg.style.color = "#4CAF50";
+                }
+            }
+        }
+
+        // --- УРОВЕНЬ 1: Станки (paint и double) ---
         let draggedData = null;
         let draggedType = null;
         
@@ -284,22 +350,18 @@
             let sugarInput = document.getElementById('sugarInput').value;
             let sugar = parseInt(sugarInput);
 
-            // Обработка данных
             if(mode === 'default') {
                 document.getElementById('sugarInput').value = '';
                 sugar = 0;
                 msg.innerHTML = "Сработал Default (0).<br>Кофе без сахара готов!";
                 msg.style.color = "#ccc";
             } else {
-                if(isNaN(sugar) || sugar < 0) sugar = 0; // Защита от текста и минуса
-                
-                // Защита от перегрузки сервера (лимит коробки)
+                if(isNaN(sugar) || sugar < 0) sugar = 0; 
                 if(sugar > 50) {
                     msg.innerHTML = "🛑 ОШИБКА!<br>В коробке всего 50 кусочков сахара!";
                     msg.style.color = "#e74c3c";
-                    return; // Прерываем функцию, кофе не заварится
+                    return; 
                 }
-                
                 if (sugar === 0) {
                     msg.innerHTML = `Аргумент: 0.<br>Кофе без сахара готов!`;
                 } else {
@@ -308,27 +370,20 @@
                 msg.style.color = "#66fcf1";
             }
 
-            // Анимация тряски кружки
             cup.style.animation = 'shake 0.3s';
             setTimeout(() => cup.style.animation = '', 300);
 
-            // Анимация падающего сахара
             if(sugar > 0) {
                 for(let i = 0; i < sugar; i++) {
                     setTimeout(() => {
                         let cube = document.createElement('div');
                         cube.className = 'sugar-cube-anim';
                         cube.innerText = '🧊';
-                        
-                        // Случайное смещение по горизонтали, чтобы кубики падали реалистичнее
                         let randomX = 20 + Math.random() * 40; 
                         cube.style.left = randomX + 'px';
-                        
                         cup.appendChild(cube);
-                        
-                        // Удаляем кубик после того как анимация завершится
                         setTimeout(() => cube.remove(), 600);
-                    }, i * 80); // Каждый следующий кубик падает с задержкой 80 миллисекунд
+                    }, i * 80);
                 }
             }
         }
@@ -345,7 +400,6 @@
             z.addEventListener('drop', e => {
                 e.preventDefault();
                 if(z.classList.contains('drop-zone-code')) z.classList.remove('dragover');
-                
                 if(z.classList.contains('drop-zone-code') && z.children.length > 0) {
                     document.getElementById('codePal').appendChild(z.children[0]);
                 }
@@ -364,8 +418,8 @@
             });
             let r = document.getElementById('resCode');
             r.style.display = 'block';
-            if(empty) { r.style.background = '#e74c3c'; r.color='#fff'; r.innerText = '⚠️ Вставь все блоки!'; }
-            else if(correct) { r.style.background = '#45a29e'; r.style.color='#000'; r.innerText = '✅ Идеально! Функция правильно ВЕРНУЛА результат через return![cite: 6]'; }
+            if(empty) { r.style.background = '#e74c3c'; r.style.color='#fff'; r.innerText = '⚠️ Вставь все блоки!'; }
+            else if(correct) { r.style.background = '#45a29e'; r.style.color='#000'; r.innerText = '✅ Идеально! Функция правильно ВЕРНУЛА результат через return!'; }
             else { r.style.background = '#1f2833'; r.style.color='#c5c6c7'; r.innerText = '❌ Ошибка! Вспомни: def наверху, затем логика, а return всегда в самом конце!'; }
         }
     </script>
