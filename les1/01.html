@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Основы Веб-разработки 🚀</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3e5f5; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #4a148c; margin-bottom: 5px; text-align: center; }
+        p { color: #666; margin-bottom: 20px; text-align: center; font-size: 16px; }
+        
+        .game-container { background: white; width: 100%; max-width: 900px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        .tabs { display: flex; background-color: #ce93d8; }
+        .tab-btn { flex: 1; padding: 15px; font-size: 16px; font-weight: bold; border: none; background: none; cursor: pointer; transition: 0.3s; color: white; border-bottom: 4px solid transparent; }
+        .tab-btn.active { background-color: #ab47bc; border-bottom: 4px solid #4a148c; }
+        .tab-btn:hover { background-color: #ba68c8; }
+        
+        .level-content { display: none; padding: 30px; min-height: 400px; }
+        .level-content.active { display: block; }
+
+        /* --- УРОВЕНЬ 1: Термины --- */
+        .quiz-card { background: #fafafa; border: 2px solid #ce93d8; border-radius: 10px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .quiz-question { font-size: 22px; font-weight: bold; color: #4a148c; margin-bottom: 20px; }
+        .quiz-options { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .quiz-option { background: #e1bee7; border: none; padding: 12px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #4a148c; transition: 0.2s; width: 45%; }
+        .quiz-option:hover { background: #ce93d8; transform: scale(1.05); }
+        .quiz-feedback { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 25px; }
+
+        /* --- УРОВЕНЬ 2: HTML vs CSS --- */
+        .sort-container { display: flex; justify-content: space-around; gap: 20px; margin-top: 20px; }
+        .sort-zone { flex: 1; background: #f3e5f5; border: 3px dashed #ab47bc; border-radius: 10px; padding: 20px; text-align: center; min-height: 200px; }
+        .sort-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .task-item { background: white; padding: 10px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; font-weight: bold; transition: 0.2s; border: 2px solid transparent; }
+        .task-item:hover { border-color: #ab47bc; }
+        #items-to-sort { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; background: #fff3e0; padding: 15px; border-radius: 10px; }
+
+        /* --- УРОВЕНЬ 3: Мастер Тегов --- */
+        .editor-container { display: flex; gap: 20px; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }
+        .tag-btn { background: #ba68c8; color: white; border: none; padding: 10px 15px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .tag-btn:hover { background: #9c27b0; }
+        .code-area, .preview-area { flex: 1; display: flex; flex-direction: column; }
+        .box-title { background: #4a148c; color: white; padding: 8px; text-align: center; font-weight: bold; border-radius: 8px 8px 0 0; }
+        .code-input { flex: 1; padding: 15px; font-family: monospace; font-size: 16px; border: 2px solid #4a148c; border-top: none; border-radius: 0 0 8px 8px; resize: none; min-height: 200px; }
+        .preview-box { flex: 1; padding: 15px; background: white; border: 2px solid #4a148c; border-top: none; border-radius: 0 0 8px 8px; overflow-y: auto; min-height: 200px; }
+
+        /* --- УРОВЕНЬ 4: Анатомия Браузера --- */
+        .browser-mockup { border: 3px solid #ccc; border-radius: 10px; overflow: hidden; background: white; position: relative; }
+        .b-header { background: #e0e0e0; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .b-dot { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
+        .b-dot:nth-child(2) { background: #ffbd2e; }
+        .b-dot:nth-child(3) { background: #27c93f; }
+        .b-btn { background: white; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .b-address { flex: 1; background: white; padding: 5px 10px; border-radius: 15px; border: 1px solid #ccc; font-family: monospace; cursor: pointer; }
+        .b-body { height: 200px; background: #fafafa; display: flex; justify-content: center; align-items: center; flex-direction: column; position: relative; }
+        .b-f12 { position: absolute; bottom: 20px; right: 20px; background: #4a148c; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        .mission-text { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #d32f2f; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Основы Веб-разработки: Урок 1 🚀</h1>
+    <p>Докажи, что ты готов стать настоящим программистом!</p>
+
+    <div class="game-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openLevel(1)">1. Словарь Айтишника</button>
+            <button class="tab-btn" onclick="openLevel(2)">2. HTML или CSS?</button>
+            <button class="tab-btn" onclick="openLevel(3)">3. Мастер Тегов</button>
+            <button class="tab-btn" onclick="openLevel(4)">4. Хакерский Браузер</button>
+        </div>
+
+        <!-- УРОВЕНЬ 1: Викторина -->
+        <div id="level1" class="level-content active">
+            <div class="quiz-card">
+                <div class="quiz-question" id="q-text">Вопрос загружается...</div>
+                <div class="quiz-options" id="q-options"></div>
+                <div class="quiz-feedback" id="q-feedback"></div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 2: Сортировка HTML/CSS -->
+        <div id="level2" class="level-content">
+            <h2 style="text-align:center; margin-top:0;">Куда это отнести? Кликни по карточке!</h2>
+            <div id="items-to-sort">
+                <div class="task-item" onclick="sortItem(this, 'HTML')">Вставить поле для ввода пароля</div>
+                <div class="task-item" onclick="sortItem(this, 'CSS')">Закруглить углы у квадратной кнопки</div>
+                <div class="task-item" onclick="sortItem(this, 'HTML')">Сделать слово кликабельной ссылкой</div>
+                <div class="task-item" onclick="sortItem(this, 'CSS')">Сделать шрифт гигантского размера (100px)</div>
+                <div class="task-item" onclick="sortItem(this, 'HTML')">Создать список покупок с точечками</div>
+                <div class="task-item" onclick="sortItem(this, 'CSS')">Добавить полупрозрачную тень под картинкой</div>
+            </div>
+            <div class="sort-container">
+                <div class="sort-zone" id="zone-html">
+                    <div class="sort-title" style="color: #e65100;">🦴 HTML (Скелет)</div>
+                </div>
+                <div class="sort-zone" id="zone-css">
+                    <div class="sort-title" style="color: #0277bd;">🎨 CSS (Дизайн)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 3: Песочница тегов -->
+        <div id="level3" class="level-content">
+            <p style="margin-top:0;">Выдели текст и нажми на кнопку тега. Посмотри, что получится справа!</p>
+            <div class="toolbar">
+                <button class="tag-btn" onclick="wrapText('<h1>', '</h1>')">Заголовок (h1)</button>
+                <button class="tag-btn" onclick="wrapText('<p>', '</p>')">Абзац (p)</button>
+                <button class="tag-btn" onclick="wrapText('<b>', '</b>')">Жирный (b)</button>
+                <button class="tag-btn" onclick="wrapText('<i>', '</i>')">Курсив (i)</button>
+                <button class="tag-btn" onclick="wrapText('<u>', '</u>')">Подчеркнутый (u)</button>
+            </div>
+            <div class="editor-container">
+                <div class="code-area">
+                    <div class="box-title">Код (index.html)</div>
+                    <textarea class="code-input" id="html-editor" oninput="updatePreview()"><!DOCTYPE html>
+<html>
+<head>
+    <title>Моя Игра</title>
+</head>
+<body>
+
+Тут будет мой первый сайт!
+Я люблю программировать.
+
+</body>
+</html></textarea>
+                </div>
+                <div class="preview-area">
+                    <div class="box-title">Браузер (Результат)</div>
+                    <div class="preview-box" id="html-preview"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- УРОВЕНЬ 4: Браузер -->
+        <div id="level4" class="level-content">
+            <div class="mission-text" id="browser-mission">Миссия: Найди и кликни на АДРЕСНУЮ СТРОКУ (URL)</div>
+            
+            <div class="browser-mockup">
+                <div class="b-header">
+                    <div class="b-dot"></div><div class="b-dot"></div><div class="b-dot"></div>
+                    <button class="b-btn" onclick="checkBrowser('refresh')">↻</button>
+                    <div class="b-address" onclick="checkBrowser('url')">https://ligarobotov.ru</div>
+                </div>
+                <div class="b-body">
+                    <h1>Привет, мир!</h1>
+                    <p>Это самый лучший сайт.</p>
+                    <button class="b-f12" onclick="checkBrowser('f12')">F12 / Просмотреть код</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function openLevel(level) {
+            document.querySelectorAll('.level-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('level' + level).classList.add('active');
+            document.querySelectorAll('.tab-btn')[level - 1].classList.add('active');
+            if(level === 3) updatePreview();
+        }
+
+        // --- УРОВЕНЬ 1: Викторина ---
+        const questions = [
+            { q: "Что такое браузер (Google Chrome, Яндекс)?", options: ["Секретный код", "Программа для открытия сайтов", "Название игры"], a: 1 },
+            { q: "Что такое URL-адрес?", options: ["Ссылка на сайт (например, ya.ru)", "Пароль от компьютера", "Картинка на сайте"], a: 0 },
+            { q: "Сайт — это просто набор...", options: ["Игрушек", "Файлов на чьем-то компьютере в интернете", "Проводов"], a: 1 },
+            { q: "Какой тег создает самый ГЛАВНЫЙ и большой заголовок?", options: ["&lt;p&gt;", "&lt;h6&gt;", "&lt;h1&gt;"], a: 2 },
+            { q: "Как быстро создать базовый скелет HTML-документа в VS Code?", options: ["Написать ! и нажать Tab (или Enter)", "Нажать Ctrl + C", "Ввести команду СТАРТ"], a: 0 }
+        ];
+        let currentQ = 0;
+
+        function loadQuestion() {
+            if(currentQ >= questions.length) {
+                document.getElementById('q-text').innerText = "🎉 Ты ответил на все вопросы!";
+                document.getElementById('q-options').innerHTML = "";
+                return;
+            }
+            const q = questions[currentQ];
+            document.getElementById('q-text').innerText = q.q;
+            let html = '';
+            q.options.forEach((opt, index) => {
+                html += `<button class="quiz-option" onclick="checkAnswer(${index})">${opt}</button>`;
+            });
+            document.getElementById('q-options').innerHTML = html;
+            document.getElementById('q-feedback').innerText = "";
+        }
+
+        function checkAnswer(index) {
+            if(index === questions[currentQ].a) {
+                document.getElementById('q-feedback').style.color = "green";
+                document.getElementById('q-feedback').innerText = "✅ Правильно!";
+                currentQ++;
+                setTimeout(loadQuestion, 1500);
+            } else {
+                document.getElementById('q-feedback').style.color = "red";
+                document.getElementById('q-feedback').innerText = "❌ Ошибка! Подумай еще.";
+            }
+        }
+        loadQuestion();
+
+        // --- УРОВЕНЬ 2: Сортировка ---
+        function sortItem(element, type) {
+            const correctType = element.getAttribute('onclick').includes(type) ? type : (type === 'HTML' ? 'CSS' : 'HTML');
+            if (type === correctType) {
+                element.style.background = "#c8e6c9"; // green
+                document.getElementById('zone-' + type.toLowerCase()).appendChild(element);
+                element.onclick = null; // disable clicking
+            } else {
+                element.style.background = "#ffcdd2"; // red
+                setTimeout(() => element.style.background = "white", 500);
+            }
+        }
+
+        // --- УРОВЕНЬ 3: Мастер Тегов ---
+        function updatePreview() {
+            const code = document.getElementById('html-editor').value;
+            // Простая имитация рендера. Берем только содержимое body
+            const bodyContent = code.substring(code.indexOf('<body>') + 6, code.indexOf('</body>'));
+            document.getElementById('html-preview').innerHTML = bodyContent || code;
+        }
+
+        function wrapText(startTag, endTag) {
+            const textarea = document.getElementById('html-editor');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            if (start === end) {
+                alert("Сначала выдели мышкой текст, который хочешь обернуть в тег!");
+                return;
+            }
+
+            const before = text.substring(0, start);
+            const selected = text.substring(start, end);
+            const after = text.substring(end, text.length);
+
+            textarea.value = before + startTag + selected + endTag + after;
+            updatePreview();
+        }
+
+        // --- УРОВЕНЬ 4: Браузер ---
+        let browserStep = 0;
+        function checkBrowser(action) {
+            const mission = document.getElementById('browser-mission');
+            if (browserStep === 0 && action === 'url') {
+                mission.innerText = "✅ Отлично! Теперь найди кнопку ПЕРЕЗАГРУЗКИ страницы.";
+                mission.style.color = "green";
+                browserStep++;
+            } else if (browserStep === 1 && action === 'refresh') {
+                mission.innerText = "✅ Супер! А где Инструменты Разработчика (чтобы посмотреть код)?";
+                browserStep++;
+            } else if (browserStep === 2 && action === 'f12') {
+                mission.innerText = "🎉 Бинго! Ты знаешь браузер как настоящий разработчик!";
+                browserStep++;
+            } else if (browserStep < 3) {
+                const oldText = mission.innerText;
+                mission.innerText = "❌ Не туда! Ищи внимательнее!";
+                mission.style.color = "red";
+                setTimeout(() => { mission.innerText = oldText; mission.style.color = browserStep===0 ? "#d32f2f" : "green"; }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>
