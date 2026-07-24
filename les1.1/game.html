@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Пазл</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eceff1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Шапка */
+        header {
+            background-color: #f57c00;
+            color: white;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Панель уровней */
+        .level-tabs {
+            background-color: white;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            background-color: #eeeeee;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .level-btn.active {
+            background-color: #f57c00;
+            color: white;
+        }
+
+        /* Игровое поле */
+        .game-area {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .slots-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slot {
+            height: 50px;
+            border: 2px dashed #b0bec5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            font-size: 16px;
+            color: #90a4ae;
+            font-style: italic;
+            transition: 0.2s;
+        }
+
+        .slot.drag-over {
+            background-color: #ffe0b2;
+            border-color: #f57c00;
+        }
+
+        .slot.filled {
+            border: 2px solid transparent;
+            background-color: #bbdefb;
+            color: #0d47a1;
+            font-style: normal;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .slot.filled:hover {
+            background-color: #90caf9;
+        }
+
+        /* Зона с тегами (внизу) */
+        .pool-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-height: 120px;
+        }
+
+        .pool-title {
+            color: #607d8b;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .tags-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .draggable-tag {
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            user-select: none;
+        }
+
+        .draggable-tag:active {
+            cursor: grabbing;
+        }
+
+        /* Кнопка проверки (3 уровень) */
+        #check-btn {
+            display: none;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 20px;
+            transition: 0.2s;
+        }
+
+        #check-btn:hover {
+            background-color: #388e3c;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal h2 { margin-top: 0; color: #333; }
+        .modal p { color: #555; font-size: 16px; line-height: 1.5; }
+        .modal button {
+            margin-top: 20px;
+            background-color: #f57c00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>HTML Строитель</header>
+
+    <div class="level-tabs">
+        <button class="level-btn active" onclick="startLevel(1)" id="btn-lvl-1">Уровень 1<br><small>(Подсказки)</small></button>
+        <button class="level-btn" onclick="startLevel(2)" id="btn-lvl-2">Уровень 2<br><small>(Без подсказок)</small></button>
+        <button class="level-btn" onclick="startLevel(3)" id="btn-lvl-3">Уровень 3<br><small>(Сам по себе)</small></button>
+    </div>
+
+    <div class="game-area">
+        <div class="slots-container" id="slots-container"></div>
+        <button id="check-btn" onclick="checkLevel3()">Проверить сайт!</button>
+    </div>
+
+    <div class="pool-container">
+        <div class="pool-title">Перетащи теги на нужные места:</div>
+        <div class="tags-wrap" id="tags-pool"></div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">🎉 Отлично!</h2>
+            <p id="modal-text">Ты прошел этот уровень!</p>
+            <button onclick="closeModal()" id="modal-btn">Следующий уровень</button>
+        </div>
+    </div>
+
+    <script>
+        const correctTags = [
+            '<html>',
+            '<head>',
+            '<title>123</title>',
+            '</head>',
+            '<body>',
+            '<h1>Привет!</h1>',
+            '</body>',
+            '</html>'
+        ];
+
+        let currentLevel = 1;
+        let availableTags = [];
+        let placedTags = [];
+
+        // Перемешивание массива
+        function shuffleArray(array) {
+            let shuffled = array.slice();
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Запуск уровня
+        function startLevel(level) {
+            currentLevel = level;
+            
+            // Обновляем кнопки
+            document.querySelectorAll('.level-btn').forEach((btn, idx) => {
+                if (index = idx + 1 === level) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Кнопка проверки (только для 3 уровня)
+            document.getElementById('check-btn').style.display = 'none';
+
+            availableTags = shuffleArray(correctTags);
+            placedTags = new Array(correctTags.length).fill(null);
+
+            render();
+        }
+
+        // Отрисовка интерфейса
+        function render() {
+            const slotsContainer = document.getElementById('slots-container');
+            const poolContainer = document.getElementById('tags-pool');
+
+            slotsContainer.innerHTML = '';
+            poolContainer.innerHTML = '';
+
+            // Отрисовка слотов
+            for (let i = 0; i < correctTags.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                
+                if (placedTags[i] !== null) {
+                    // Если слот заполнен
+                    slot.classList.add('filled');
+                    slot.innerText = placedTags[i];
+                    slot.onclick = () => removeTagFromSlot(i);
+                } else {
+                    // Если слот пустой
+                    if (currentLevel === 1) {
+                        slot.innerText = correctTags[i]; // Явная подсказка
+                    } else {
+                        slot.innerText = `Слот ${i + 1}`; // Скрытая подсказка
+                    }
+
+                    // Настройка Drag & Drop
+                    slot.ondragover = (e) => {
+                        e.preventDefault();
+                        slot.classList.add('drag-over');
+                    };
+                    slot.ondragleave = () => slot.classList.remove('drag-over');
+                    slot.ondrop = (e) => handleDrop(e, i, slot);
+                }
+
+                slotsContainer.appendChild(slot);
+            }
+
+            // Отрисовка доступных тегов в пуле
+            availableTags.forEach((tag, index) => {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'draggable-tag';
+                tagEl.innerText = tag;
+                tagEl.draggable = true;
+                tagEl.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', tag);
+                };
+                poolContainer.appendChild(tagEl);
+            });
+
+            // Проверка авто-победы для Уровней 1 и 2
+            if (currentLevel < 3 && availableTags.length === 0) {
+                setTimeout(() => showModal('🎉 Отлично!', 'Ты прошел этот уровень!', true), 300);
+            }
+
+            // Показ кнопки проверки для Уровня 3
+            if (currentLevel === 3 && availableTags.length === 0) {
+                document.getElementById('check-btn').style.display = 'block';
+            } else {
+                document.getElementById('check-btn').style.display = 'none';
+            }
+        }
+
+        // Обработка броска тега в слот
+        function handleDrop(e, index, slotEl) {
+            e.preventDefault();
+            slotEl.classList.remove('drag-over');
+
+            const draggedTag = e.dataTransfer.getData('text/plain');
+
+            // Логика Уровней 1 и 2 (только правильный тег)
+            if (currentLevel < 3) {
+                if (draggedTag !== correctTags[index]) {
+                    // Красивый эффект ошибки (покачивание)
+                    slotEl.style.borderColor = 'red';
+                    setTimeout(() => slotEl.style.borderColor = '#b0bec5', 500);
+                    return;
+                }
+            }
+
+            // Помещаем тег в слот
+            placedTags[index] = draggedTag;
+            
+            // Удаляем из пула
+            const tagIndex = availableTags.indexOf(draggedTag);
+            if (tagIndex > -1) {
+                availableTags.splice(tagIndex, 1);
+            }
+
+            render();
+        }
+
+        // Возврат тега из слота обратно в пул
+        function removeTagFromSlot(index) {
+            const tag = placedTags[index];
+            if (tag) {
+                placedTags[index] = null;
+                availableTags.push(tag);
+                render();
+            }
+        }
+
+        // Проверка для Уровня 3
+        function checkLevel3() {
+            let isWin = true;
+            for (let i = 0; i < correctTags.length; i++) {
+                if (placedTags[i] !== correctTags[i]) {
+                    isWin = false;
+                    break;
+                }
+            }
+
+            if (isWin) {
+                showModal('🎉 Победа!', 'Ты собрал сайт абсолютно правильно! Молодец!', false);
+            } else {
+                showModal('Упс!', 'Где-то ошибка. Кликни по неправильным тегам, чтобы вернуть их вниз, и попробуй снова.', false);
+            }
+        }
+
+        // Работа с модальным окном
+        function showModal(title, text, isNextLevelBtn) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            
+            const btn = document.getElementById('modal-btn');
+            if (isNextLevelBtn) {
+                btn.innerText = 'Следующий уровень';
+                btn.onclick = () => {
+                    closeModal();
+                    if (currentLevel < 3) startLevel(currentLevel + 1);
+                };
+            } else {
+                btn.innerText = 'ОК';
+                btn.onclick = closeModal;
+            }
+
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        // Старт игры при загрузке
+        startLevel(1);
+
+    </script>
+</body>
+</html>
